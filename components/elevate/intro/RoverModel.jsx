@@ -9,6 +9,10 @@ import modelAsset from "../model-asset.json";
 const MODEL_URL = modelAsset.url;
 const REST_YAW = -0.38;
 
+export function preloadRoverModel() {
+  useGLTF.preload(MODEL_URL, false, true);
+}
+
 function Rover({ target, invalidateRef }) {
   const { scene } = useGLTF(MODEL_URL, false, true);
   const group = useRef(null);
@@ -61,24 +65,11 @@ function Rover({ target, invalidateRef }) {
 }
 
 export default function RoverModel() {
-  const host = useRef(null);
   const target = useRef({ pitch: 0, yaw: 0, roll: 0 });
   const invalidateRef = useRef(null);
   const dragging = useRef(null);
   const lastScroll = useRef(0);
-  const [visible, setVisible] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setVisible(true);
-        observer.disconnect();
-      }
-    }, { rootMargin: "900px" });
-    if (host.current) observer.observe(host.current);
-    return () => observer.disconnect();
-  }, []);
 
   useEffect(() => {
     const onScroll = () => {
@@ -129,7 +120,6 @@ export default function RoverModel() {
 
   return (
     <div
-      ref={host}
       className={`jx-rover-model${isDragging ? " jx-rover-model--dragging" : ""}`}
       role="group"
       tabIndex={0}
@@ -151,7 +141,7 @@ export default function RoverModel() {
         );
       }}
     >
-      {visible && <Canvas
+      <Canvas
         orthographic
         camera={{ position: [6, 4, 7], zoom: 70, near: 0.1, far: 100 }}
         dpr={[1, 1.5]}
@@ -165,7 +155,7 @@ export default function RoverModel() {
         <Suspense fallback={null}>
           <Rover target={target} invalidateRef={invalidateRef} />
         </Suspense>
-      </Canvas>}
+      </Canvas>
       <span className="jx-rover-model__hint" aria-hidden="true">Move to explore <span>·</span> Drag to rotate</span>
     </div>
   );

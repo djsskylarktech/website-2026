@@ -18,7 +18,9 @@ mkdirSync(modelDir, { recursive: true });
 try {
   const result = spawnSync(process.execPath, [
     cli, "optimize", input, temporary,
-    "--compress", "meshopt", "--simplify", "false", "--palette", "false",
+    "--compress", "meshopt", "--simplify", "true",
+    "--simplify-ratio", "0.2", "--simplify-error", "0.005",
+    "--palette", "false",
   ], { stdio: "inherit", cwd: root });
   if (result.error) throw result.error;
   if (result.status !== 0) throw new Error(`Model optimization failed (${result.status}).`);

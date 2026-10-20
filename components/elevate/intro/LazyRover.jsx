@@ -3,7 +3,8 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 
-const RoverModel = dynamic(() => import("./RoverModel"), { ssr: false });
+const loadRover = () => import("./RoverModel");
+const RoverModel = dynamic(loadRover, { ssr: false });
 
 export default function LazyRover() {
   const host = useRef(null);
@@ -11,14 +12,35 @@ export default function LazyRover() {
 
   useEffect(() => {
     if (!host.current) return undefined;
-    const observer = new IntersectionObserver(([entry]) => {
+    let warmed = false;
+    const prewarm = () => {
+      if (warmed) return;
+      warmed = true;
+      loadRover().then(({ preloadRoverModel }) => preloadRoverModel()).catch(() => {});
+    };
+    const warmup = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        prewarm();
+        warmup.disconnect();
+      }
+    }, { rootMargin: "2500px" });
+    const mount = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) {
         setNear(true);
-        observer.disconnect();
+        mount.disconnect();
       }
-    }, { rootMargin: "600px" });
-    observer.observe(host.current);
-    return () => observer.disconnect();
+    }, { rootMargin: "900px" });
+    warmup.observe(host.current);
+    mount.observe(host.current);
+    const idle = "requestIdleCallback" in window
+      ? window.requestIdleCallback(prewarm, { timeout: 3500 })
+      : window.setTimeout(prewarm, 2000);
+    return () => {
+      warmup.disconnect();
+      mount.disconnect();
+      if ("cancelIdleCallback" in window) window.cancelIdleCallback(idle);
+      else window.clearTimeout(idle);
+    };
   }, []);
 
   return <div ref={host} className="jx-rover-lazy">{near && <RoverModel />}</div>;
