@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef } from "react";
 import { gsap, ScrollTrigger, BREAKPOINT, charReveal, lineReveal, childReveal } from "./motion";
-import RoverModel from "./RoverModel";
+import LazyRover from "./LazyRover";
 
 const PRIZES = [
   { place: "2026 · Micro · Design Report", amount: "1st" },
@@ -289,7 +289,7 @@ export default function JetSection() {
         <div className="jx-jet-plane">
           <div className="jx-jet-plane__scale" data-jet>
             <div className="jx-jet-box" data-jet-box>
-              <RoverModel />
+              <LazyRover />
             </div>
           </div>
         </div>

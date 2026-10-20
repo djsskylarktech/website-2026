@@ -4,12 +4,13 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import { Box3, MathUtils, Vector3 } from "three";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import modelAsset from "../model-asset.json";
 
-const MODEL_URL = "/models/skylark-rover.glb";
+const MODEL_URL = modelAsset.url;
 const REST_YAW = -0.38;
 
 function Rover({ target, invalidateRef }) {
-  const { scene } = useGLTF(MODEL_URL);
+  const { scene } = useGLTF(MODEL_URL, false, true);
   const group = useRef(null);
   const invalidate = useThree((state) => state.invalidate);
   const { center, scale } = useMemo(() => {

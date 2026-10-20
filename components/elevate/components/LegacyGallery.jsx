@@ -8,7 +8,11 @@ import "./legacy.css";
 const archiveEnds = [seasons[0], seasons.find((season) => season.folder === "18-19"), seasons.at(-1)];
 
 function mediaImage(item) {
-  return item.type === "video" ? item.poster : item.src;
+  return item.thumb || (item.type === "video" ? item.poster : item.src);
+}
+
+function mediaSrcSet(item) {
+  return item.thumb && item.preview ? `${item.thumb} 480w, ${item.preview} 960w` : undefined;
 }
 
 export default function LegacyGallery() {
@@ -67,7 +71,7 @@ export default function LegacyGallery() {
               }}
               aria-label={`Explore the ${entry.label} archive`}
             >
-              <img src={mediaImage(entry.media[0])} alt={`DJS Skylark archive, ${entry.label}`} loading="lazy" />
+              <img src={mediaImage(entry.media[0])} srcSet={mediaSrcSet(entry.media[0])} sizes="(max-width: 650px) 100vw, (max-width: 900px) 50vw, 45vw" alt={`DJS Skylark archive, ${entry.label}`} loading="lazy" decoding="async" />
               <span className="legacy__lead-year">{entry.label}</span>
               <span className="legacy__lead-arrow" aria-hidden="true">↗</span>
             </button>
@@ -114,7 +118,7 @@ export default function LegacyGallery() {
               onClick={() => setActiveIndex(index)}
               aria-label={`Open ${item.type === "video" ? "video" : "photo"} ${index + 1} from ${season.label}`}
             >
-              <img src={mediaImage(item)} alt={`DJS Skylark archive, ${season.label}, ${item.type} ${index + 1}`} loading="lazy" />
+              <img src={mediaImage(item)} srcSet={mediaSrcSet(item)} sizes={index === 0 ? "(max-width: 650px) 100vw, 50vw" : "(max-width: 650px) 50vw, (max-width: 900px) 33vw, 25vw"} alt={`DJS Skylark archive, ${season.label}, ${item.type} ${index + 1}`} loading="lazy" decoding="async" />
               <span className="legacy__item-shade" />
               <span className="legacy__item-number">{String(index + 1).padStart(2, "0")}</span>
               {item.type === "video" && <span className="legacy__play" aria-hidden="true">▶</span>}
@@ -132,12 +136,12 @@ export default function LegacyGallery() {
           </div>
           <div className="legacy__viewer-media" onClick={(event) => event.stopPropagation()}>
             {active.type === "video" ? (
-              <video key={active.src} poster={active.poster} controls autoPlay playsInline preload="metadata">
+              <video key={active.src} poster={active.preview || active.poster} controls autoPlay playsInline preload="none">
                 <source src={active.src} type={active.src.endsWith(".webm") ? "video/webm" : "video/mp4"} />
                 {active.fallback && <source src={active.fallback} type="video/mp4" />}
               </video>
             ) : (
-              <img key={active.src} src={active.src} alt={`DJS Skylark archive, ${season.label}, photo ${activeIndex + 1}`} />
+              <img key={active.src} src={active.src} alt={`DJS Skylark archive, ${season.label}, photo ${activeIndex + 1}`} decoding="async" />
             )}
           </div>
           <div className="legacy__viewer-bottom" onClick={(event) => event.stopPropagation()}>

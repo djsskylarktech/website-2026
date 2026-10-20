@@ -35,9 +35,11 @@ Never commit `.env.local` or API keys. `NEXT_PUBLIC_` variables are embedded in 
 ## Edit the site
 
 - `components/elevate/` contains the homepage sections, flight animation, gallery, and styles.
-- `components/elevate/intro/RoverModel.jsx` controls the interactive aircraft; its runtime asset is `public/models/skylark-rover.glb`.
+- `components/elevate/intro/RoverModel.jsx` controls the interactive aircraft. `LazyRover.jsx` loads its 3D code near the section, and `model-asset.json` points to the compressed, versioned asset in `public/models/`.
 - `components/elevate/legacy-media.json` lists the media in `public/legacy/`.
 - `app/` contains route pages and metadata.
 - `data/` contains aircraft, results, and flight content.
 
-The `Past Team Photos/` archive is a local source folder. To regenerate optimized gallery copies after changing it, install Python's `opencv-python` and `Pillow` packages plus FFmpeg, then run `python scripts/build-legacy-media.py`. Commit the updated `public/legacy/` files and `components/elevate/legacy-media.json`.
+The `Past Team Photos/` archive is a local source folder. To regenerate gallery copies after changing it, install Python's `opencv-python` and `Pillow` packages plus FFmpeg, then run `python scripts/build-legacy-media.py` followed by `python scripts/build-legacy-thumbnails.py`. The second command creates small WebP thumbnails and previews so the gallery never downloads full photos just to show a grid. Commit the updated `public/legacy/` files and `components/elevate/legacy-media.json`.
+
+To replace the 3D model, put the source GLB outside `public/` and run `npm run optimize:model -- "path/to/source.glb"`. This compresses the geometry, updates `components/elevate/model-asset.json`, and replaces the previous public model. Commit both the new model and manifest. The model URL includes a content hash, so browsers cache it for a year; gallery media is cached for a day. Videos download when opened in the viewer.

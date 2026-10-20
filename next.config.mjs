@@ -7,9 +7,18 @@ const nextConfig = {
   // originals costs a little bandwidth and keeps the site buildable there.
   images: { unoptimized: true },
 
-  // GLB/GLTF aircraft models are fetched at runtime by three.js, not imported,
-  // so they need no loader — they live in /public/models and are swapped by
-  // dropping in a new file. See data/aircraft.ts for the wiring.
+  async headers() {
+    return [
+      {
+        source: "/models/:path*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
+      {
+        source: "/legacy/:path*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

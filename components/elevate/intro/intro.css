@@ -1370,6 +1370,11 @@ html.in-jet .arriving {
   transform: translate(7%, -50%);
 }
 
+.jx-rover-lazy {
+  position: absolute;
+  inset: 0;
+}
+
 .jx-rover-model {
   position: absolute;
   inset: 0;
