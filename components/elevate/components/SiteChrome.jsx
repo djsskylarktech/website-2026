@@ -109,7 +109,8 @@ export function PlaneCursor() {
   useEffect(() => {
     const fine = window.matchMedia("(pointer: fine)").matches;
     if (!fine || prefersReducedMotion()) return;
-    setEnabled(true);
+    const frame = requestAnimationFrame(() => setEnabled(true));
+    return () => cancelAnimationFrame(frame);
   }, []);
 
   useEffect(() => {

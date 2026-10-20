@@ -14,7 +14,7 @@ import { PanelFrame } from "@/components/content/PanelFrame";
 import { Navbar } from "@/components/navigation/Navbar";
 import { SpecFigure } from "@/components/ui/SpecList";
 import { Placeholder } from "@/components/ui/Placeholder";
-import { aircraft, HERO_AIRCRAFT } from "@/data/aircraft";
+import { HERO_AIRCRAFT } from "@/data/aircraft";
 import { achievementsByYear, TEAM_FACTS, UNVERIFIED_YEARS } from "@/data/achievements";
 import { FLIGHT_SCROLL_VH } from "@/data/flight";
 import { useCapability } from "@/lib/use-capability";

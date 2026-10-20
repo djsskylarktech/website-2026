@@ -133,7 +133,7 @@ function Fuselage({ x, mats }: { x: number; mats: Record<string, THREE.MeshStand
 
   // The props turn. At cruise a real propeller is a disc, but a slow visible
   // rotation reads better than a blur at this scale.
-  useFrame((_, delta) => {
+  useFrame(() => {
     if (prop.current) prop.current.rotation.z = flightState.progress * 1800;
   });
 

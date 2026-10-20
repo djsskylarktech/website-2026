@@ -154,7 +154,7 @@ export function CloudDeck({ altitude = 30, reduced = false }: { altitude?: numbe
       gl_FragColor = vec4(color, alpha); }`,
   }), [texture]);
   useEffect(() => () => { geometry.dispose(); material.dispose(); }, [geometry, material]);
-  useFrame((_, delta) => { if (group.current) group.current.position.x = Math.sin(flightState.progress * Math.PI) * 2; });
+  useFrame(() => { if (group.current) group.current.position.x = Math.sin(flightState.progress * Math.PI) * 2; });
   return <group ref={group}><mesh geometry={geometry} material={material} frustumCulled={false} /></group>;
 }
 

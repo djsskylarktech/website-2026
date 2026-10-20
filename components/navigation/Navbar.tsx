@@ -29,7 +29,7 @@ export function Navbar({ overFlight = false }: { overFlight?: boolean }) {
 
   useEffect(() => {
     if (!overFlight) return;
-    return subscribeFlight((state) => {
+    return subscribeFlight(() => {
       setRevealed(true);
     });
   }, [overFlight]);

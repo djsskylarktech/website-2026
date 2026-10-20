@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Navbar } from "@/components/navigation/Navbar";
-import { PanelFrame } from "@/components/content/PanelFrame";
 import { SpecList, SpecFigure } from "@/components/ui/SpecList";
 import { PlaceholderBlock } from "@/components/ui/Placeholder";
 import { FigureGrid } from "@/components/content/FigureGrid";

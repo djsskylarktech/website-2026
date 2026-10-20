@@ -38,7 +38,10 @@ export default function BoardingPass() {
   const cloudUrl = useHeroCloud();
 
   useEffect(() => {
-    if (!seen) { setTorn(false); return; }
+    if (!seen) {
+      const id = setTimeout(() => setTorn(false), 0);
+      return () => clearTimeout(id);
+    }
     const id = setTimeout(() => { setTorn(true); cue("stamp"); }, prefersReducedMotion() ? 0 : 900);
     return () => clearTimeout(id);
   }, [seen]);

@@ -21,7 +21,6 @@ export function FigureGrid({ figures }: { figures: Figure[] }) {
           <div className="relative overflow-hidden rounded-sm bg-ivory-50">
             {/* Plain <img>: Next's optimiser is off (its native dependency is
                 blocked on the team's machines), and these are already sized. */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={fig.src}
               alt={fig.caption}

@@ -12,7 +12,15 @@ export default function SoundToggle() {
   const [started, setStarted] = useState(false);
   const engineRef = useRef(null);
 
-  if (!engineRef.current && typeof window !== "undefined") engineRef.current = createEngine();
+  useEffect(() => {
+    const engine = createEngine();
+    engineRef.current = engine;
+    return () => {
+      engine.disable();
+      setActiveEngine(null);
+      engineRef.current = null;
+    };
+  }, []);
 
   useEffect(() => {
     const engine = engineRef.current;

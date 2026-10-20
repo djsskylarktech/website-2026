@@ -38,7 +38,9 @@ const mono = Roboto_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://djsskylark.com"),
+  metadataBase: process.env.NEXT_PUBLIC_SITE_URL
+    ? new URL(process.env.NEXT_PUBLIC_SITE_URL)
+    : undefined,
   title: {
     default: "DJS Skylark — Aero Design Team",
     template: "%s — DJS Skylark",

@@ -13,7 +13,6 @@ export function PanelFrame({
   index,
   label,
   children,
-  side = "left",
   className = "",
 }: {
   /** Section number, e.g. "01". Shown as metadata, not decoration. */

@@ -6,7 +6,12 @@
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint app components data lib --max-warnings 0",
+    "typecheck": "tsc --noEmit",
+    "test": "node tests/flight-route.cjs"
+  },
+  "engines": {
+    "node": ">=20.9.0"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.9",
@@ -25,8 +30,10 @@
     "@types/react-dom": "^19.3.0",
     "@types/three": "^0.186.0",
     "autoprefixer": "^10.6.1",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.3.8",
     "postcss": "^8.5.28",
     "tailwindcss": "^3.4.19",
-    "typescript": "^7.0.2"
+    "typescript": "^5.9.3"
   }
 }
