@@ -1,0 +1,28 @@
+.skylark-elevate .bp__qr--brand {
+  font-family: "Archivo", Arial, sans-serif;
+  font-size: clamp(1.25rem, 2.8vw, 2.3rem);
+  font-weight: 900;
+  line-height: .94;
+  letter-spacing: -.04em;
+  text-align: center;
+}
+
+.skylark-elevate .sponsors__card--aircraft {
+  min-height: 8rem;
+  justify-content: center;
+}
+
+.skylark-elevate .sponsors__detail {
+  max-width: 17rem;
+  font-size: .65rem;
+  line-height: 1.45;
+  color: #697588;
+}
+
+.skylark-elevate .pass__countdown--stats .pass__countParts {
+  justify-content: center;
+}
+
+@media (max-width: 760px) {
+  .skylark-elevate .sponsors__card--aircraft { min-height: 6rem; }
+}

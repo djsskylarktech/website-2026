@@ -1,130 +1,83 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 import { TilesRenderer } from "3d-tiles-renderer";
-import { GoogleCloudAuthPlugin, TileCompressionPlugin } from "3d-tiles-renderer/plugins";
+import { ReorientationPlugin, GLTFExtensionsPlugin } from "3d-tiles-renderer/plugins";
+import { GoogleCloudAuthPlugin } from "3d-tiles-renderer/core/plugins";
+import { flightState, onFlightFrame } from "@/lib/flight-store";
 
-/**
- * Photorealistic Mumbai, from Google's 3D Tiles.
- *
- * This is real photogrammetry of the actual city, not scenery: the aircraft
- * genuinely flies over Mumbai's coastline.
- *
- * Two things make this work with a hand-built flight path. The tileset is in
- * earth-centred, earth-fixed coordinates — metres from the centre of the
- * planet — so it has to be rotated and translated until the chosen latitude
- * and longitude sit at the origin with "up" pointing along +Y. And it streams,
- * so it is told where the camera is each frame and left to fetch what it needs.
- *
- * Without an API key this renders nothing and the plain ground stays visible,
- * so the site never depends on Google being reachable.
- */
-
-/** Marine Drive, Mumbai — coastline on one side, city on the other. */
-const ORIGIN = { lat: 18.9435, lon: 72.8235, height: 0 };
-
-/** World units per metre. The flight is ~450 units long; the city is km wide. */
-const SCALE = 1 / 26;
-
-export function GoogleCity({ apiKey }: { apiKey?: string }) {
+// Vile Parle, Mumbai. Local +Y is altitude; 20 real metres = one scene unit.
+export function GoogleCity({ apiKey, reduced = false }: { apiKey?: string; reduced?: boolean }) {
   const { camera, gl } = useThree();
-  const group = useRef<THREE.Group>(null);
-  const [failed, setFailed] = useState(false);
+  const root = useRef<THREE.Group>(null);
+  const renderer = useRef<TilesRenderer | null>(null);
+  const lastUpdate = useRef(0);
+  const lastCredits = useRef(0);
 
-  const tiles = useMemo(() => {
-    if (!apiKey) return null;
-
-    const t = new TilesRenderer();
-    t.registerPlugin(new GoogleCloudAuthPlugin({ apiToken: apiKey, autoRefreshToken: true }));
-    // Draco/KTX2 payloads arrive compressed; decoding them on the GPU keeps
-    // memory sane while streaming a city.
-    t.registerPlugin(new TileCompressionPlugin());
-
-    // Stream less aggressively than the default. The city is background: it
-    // must not compete with the aircraft for frame time.
-    t.errorTarget = 24;
-    t.maxDepth = 15;
-    t.lruCache.minSize = 300;
-    t.lruCache.maxSize = 600;
-
-    return t;
-  }, [apiKey]);
-
-  // Place the chosen lat/lon at the origin, oriented so up is +Y.
   useEffect(() => {
-    if (!tiles || !group.current) return;
-
-    const onLoad = () => {
-      const ellipsoid = tiles.ellipsoid;
-      const position = new THREE.Vector3();
-      const matrix = new THREE.Matrix4();
-
-      ellipsoid.getCartographicToPosition(
-        THREE.MathUtils.degToRad(ORIGIN.lat),
-        THREE.MathUtils.degToRad(ORIGIN.lon),
-        ORIGIN.height,
-        position,
-      );
-      ellipsoid.getEastNorthUpFrame(
-        THREE.MathUtils.degToRad(ORIGIN.lat),
-        THREE.MathUtils.degToRad(ORIGIN.lon),
-        ORIGIN.height,
-        matrix,
-      );
-
-      // Invert the local frame so that point ends up at the origin facing up,
-      // then scale the whole planet down to the size of this flight.
-      tiles.group.matrix.copy(matrix).invert();
-      tiles.group.matrix.decompose(
-        tiles.group.position,
-        tiles.group.quaternion,
-        tiles.group.scale,
-      );
-      tiles.group.scale.setScalar(SCALE);
-      tiles.group.position.multiplyScalar(SCALE);
-
-      // Sit the city below the flight so the aircraft is genuinely above it.
-      tiles.group.position.y -= 2;
-      tiles.group.updateMatrixWorld(true);
-      void position;
-    };
-
-    tiles.addEventListener("load-tile-set", onLoad);
-    tiles.addEventListener("load-error", () => setFailed(true));
-
-    group.current.add(tiles.group);
-    const owner = group.current;
-    return () => {
-      tiles.removeEventListener("load-tile-set", onLoad);
-      owner.remove(tiles.group);
-      tiles.dispose();
-    };
-  }, [tiles]);
-
-  useFrame(() => {
-    if (!tiles || failed) return;
+    if (!apiKey || !root.current) { flightState.cityStatus = "unavailable"; return; }
+    const tiles = new TilesRenderer("https://tile.googleapis.com/v1/3dtiles/root.json");
+    const decoder = new DRACOLoader().setDecoderPath("/draco/").setWorkerLimit(reduced ? 1 : 2);
+    tiles.registerPlugin(new GoogleCloudAuthPlugin({ apiToken: apiKey, autoRefreshToken: true }));
+    tiles.registerPlugin(new ReorientationPlugin({ lat: THREE.MathUtils.degToRad(19.1005), lon: THREE.MathUtils.degToRad(72.8463), height: 15 }));
+    tiles.registerPlugin(new GLTFExtensionsPlugin({ dracoLoader: decoder }));
+    // Coarse visible coverage first; never limit traversal depth (Google's root is global).
+    tiles.errorTarget = reduced ? 40 : 28;
+    tiles.loadSiblings = false;
+    tiles.downloadQueue.maxJobsPerOrigin = reduced ? 4 : 8;
+    tiles.parseQueue.maxJobs = 1;
+    tiles.lruCache.minSize = reduced ? 40 : 80;
+    tiles.lruCache.maxSize = reduced ? 100 : 180;
     tiles.setCamera(camera);
+    const owner = root.current;
+    owner.add(tiles.group);
+    renderer.current = tiles;
+    flightState.cityStatus = "loading";
+    const ready = () => { flightState.cityStatus = "ready"; };
+    const error = ({ tile }: { tile: unknown }) => {
+      // A failed child must not permanently destroy the whole city.
+      if (!tile) flightState.cityStatus = "unavailable";
+    };
+    tiles.addEventListener("load-model", ready);
+    tiles.addEventListener("load-error", error);
+    return () => {
+      renderer.current = null;
+      owner.remove(tiles.group);
+      tiles.removeEventListener("load-model", ready);
+      tiles.removeEventListener("load-error", error);
+      tiles.dispose();
+      flightState.cityCredits = "";
+    };
+  }, [apiKey, camera, reduced]);
+
+  useFrame(({ clock }) => {
+    const tiles = renderer.current;
+    if (!tiles || clock.elapsedTime - lastUpdate.current < 0.10) return;
+    lastUpdate.current = clock.elapsedTime;
     tiles.setResolutionFromRenderer(camera, gl);
     camera.updateMatrixWorld();
     tiles.update();
+    if (clock.elapsedTime - lastCredits.current > 1) {
+      lastCredits.current = clock.elapsedTime;
+      flightState.cityCredits = tiles.getAttributions().filter(a => a.type === "string").map(a => String(a.value)).join(" · ");
+    }
   });
-
-  if (!apiKey || failed) return null;
-
-  return <group ref={group} name="mumbai" />;
+  return <group ref={root} scale={0.05} position={[0, -3, 0]} name="vile-parle-city" />;
 }
 
-/**
- * Google requires its attribution to be shown wherever its tiles are. This is
- * a licensing condition, not decoration — do not remove it.
- */
 export function GoogleCityAttribution({ apiKey }: { apiKey?: string }) {
+  const credits = useRef<HTMLSpanElement>(null);
+  const root = useRef<HTMLDivElement>(null);
+  useEffect(() => onFlightFrame(() => {
+    if (credits.current) credits.current.textContent = flightState.cityCredits;
+    if (root.current) root.current.style.display = flightState.cityCredits ? "flex" : "none";
+  }), []);
   if (!apiKey) return null;
-  return (
-    <p className="pointer-events-none fixed bottom-3 left-[5vw] z-20 font-mono text-[0.625rem] uppercase tracking-wider text-white/70 drop-shadow">
-      Imagery ©2026 Google
-    </p>
-  );
+  return <div ref={root} style={{ display: "none" }} className="city-attribution">
+    <span className="city-brand">Google Maps</span>
+    <span>City imagery · <span ref={credits} /></span>
+  </div>;
 }

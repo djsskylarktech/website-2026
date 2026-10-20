@@ -25,12 +25,12 @@ const LINKS = [
 
 export function Navbar({ overFlight = false }: { overFlight?: boolean }) {
   // Over the flight the bar reveals itself once the aircraft is airborne.
-  const [revealed, setRevealed] = useState(!overFlight);
+  const [revealed, setRevealed] = useState(true);
 
   useEffect(() => {
     if (!overFlight) return;
     return subscribeFlight((state) => {
-      setRevealed(state.reducedMotion || state.progress > 0.14);
+      setRevealed(true);
     });
   }, [overFlight]);
 

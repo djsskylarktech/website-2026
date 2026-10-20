@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
+import { flightState } from "@/lib/flight-store";
 
 /**
  * Daylight sky, cumulus deck and hazy terrain.
@@ -34,7 +35,7 @@ const SKY_FRAG = `
   varying vec3 vWorld;
 
   void main() {
-    vec3 dir = normalize(vWorld);
+    vec3 dir = normalize(vWorld - cameraPosition);
     float h = clamp(dir.y * 0.5 + 0.5, 0.0, 1.0);
 
     vec3 col = mix(uHorizon, uMid, smoothstep(0.48, 0.63, h));
@@ -51,6 +52,8 @@ const SKY_FRAG = `
 export const SUN_DIRECTION = new THREE.Vector3(-0.35, 0.42, 0.84).normalize();
 
 export function SkyDome() {
+  const dome = useRef<THREE.Mesh>(null);
+  useFrame(({ camera }) => { dome.current?.position.copy(camera.position); });
   const uniforms = useMemo(
     () => ({
       // Clear mid-morning: pale warm haze at the horizon rising to a deep,
@@ -65,7 +68,7 @@ export function SkyDome() {
   );
 
   return (
-    <mesh scale={[-1, 1, 1]} renderOrder={-1} frustumCulled={false}>
+    <mesh ref={dome} renderOrder={-1} frustumCulled={false}>
       <sphereGeometry args={[620, 32, 20]} />
       <shaderMaterial
         vertexShader={SKY_VERT}
@@ -111,86 +114,48 @@ function usePuffTexture() {
  * Puffs are grouped into clumps so the deck reads as cloud rather than as an
  * even scatter of dots.
  */
-export function CloudDeck({
-  altitude = 24,
-  reduced = false,
-}: {
-  altitude?: number;
-  reduced?: boolean;
-}) {
+export function CloudDeck({ altitude = 30, reduced = false }: { altitude?: number; reduced?: boolean }) {
   const texture = usePuffTexture();
   const group = useRef<THREE.Group>(null);
-
   const geometry = useMemo(() => {
     let seed = 7;
-    const rand = () => {
-      seed = (seed * 1664525 + 1013904223) % 4294967296;
-      return seed / 4294967296;
-    };
-
-    const clumps = reduced ? 24 : 50;
-    const perClump = reduced ? 7 : 11;
-    const positions: number[] = [];
+    const rand = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+    const offsets: number[] = [];
     const sizes: number[] = [];
-
-    for (let c = 0; c < clumps; c++) {
-      const cx = (rand() - 0.5) * 520;
-      const cy = altitude + (rand() - 0.5) * 12;
-      const cz = -40 - rand() * 440;
-      const spread = 16 + rand() * 26;
-
-      for (let i = 0; i < perClump; i++) {
-        positions.push(
-          cx + (rand() - 0.5) * spread * 2.4,
-          cy + (rand() - 0.5) * spread * 0.45,
-          cz + (rand() - 0.5) * spread * 2.4,
-        );
-        sizes.push(26 + rand() * 42);
+    for (let c = 0; c < (reduced ? 22 : 38); c++) {
+      const x = (rand() - 0.5) * 170;
+      const y = altitude + (rand() - 0.5) * 20;
+      const z = -150 - rand() * 530;
+      for (let i = 0; i < 7; i++) {
+        offsets.push(x + (rand() - 0.5) * 25, y + (rand() - 0.5) * 6, z + (rand() - 0.5) * 22);
+        sizes.push(8 + rand() * 11);
       }
     }
-
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-    geo.setAttribute("aScale", new THREE.Float32BufferAttribute(sizes, 1));
+    const plane = new THREE.PlaneGeometry(1, 1);
+    const geo = new THREE.InstancedBufferGeometry();
+    geo.index = plane.index;
+    geo.attributes.position = plane.attributes.position;
+    geo.attributes.uv = plane.attributes.uv;
+    geo.setAttribute("aOffset", new THREE.InstancedBufferAttribute(new Float32Array(offsets), 3));
+    geo.setAttribute("aScale", new THREE.InstancedBufferAttribute(new Float32Array(sizes), 1));
+    geo.instanceCount = sizes.length;
     return geo;
   }, [altitude, reduced]);
-
-  // One rotation on the parent per frame, not hundreds of matrix writes.
-  useFrame((_, delta) => {
-    if (group.current) group.current.rotation.y += delta * 0.0035;
-  });
-
-  const material = useMemo(() => {
-    if (!texture) return null;
-    const mat = new THREE.PointsMaterial({
-      map: texture,
-      transparent: true,
-      depthWrite: false,
-      size: 1,
-      sizeAttenuation: true,
-      color: new THREE.Color("#FFFFFF"),
-      opacity: 0.92,
-    });
-    // Per-point scale, so one material draws puffs at many sizes.
-    //
-    // The attribute must NOT be called `size`: three's points shader already
-    // declares `uniform float size`, and redeclaring it fails to compile,
-    // which silently loses the entire cloud deck.
-    mat.onBeforeCompile = (shader) => {
-      shader.vertexShader = shader.vertexShader
-        .replace("void main() {", "attribute float aScale;\nvoid main() {")
-        .replace("gl_PointSize = size;", "gl_PointSize = size * aScale;");
-    };
-    return mat;
-  }, [texture]);
-
-  if (!material) return null;
-
-  return (
-    <group ref={group}>
-      <points geometry={geometry} material={material} frustumCulled={false} />
-    </group>
-  );
+  const material = useMemo(() => new THREE.ShaderMaterial({
+    uniforms: { uPuff: { value: texture } }, transparent: true, depthWrite: false,
+    vertexShader: `attribute vec3 aOffset; attribute float aScale; varying vec2 vUv; varying float vDistance;
+      void main() { vUv = uv; vec4 center = modelViewMatrix * vec4(aOffset, 1.0);
+      vDistance = -center.z; center.xy += position.xy * aScale * vec2(1.6, 0.85);
+      gl_Position = projectionMatrix * center; }`,
+    fragmentShader: `uniform sampler2D uPuff; varying vec2 vUv; varying float vDistance;
+      void main() { float alpha = texture2D(uPuff, vUv).a * 0.5;
+      alpha *= smoothstep(2.0, 9.0, vDistance) * (1.0 - smoothstep(200.0, 380.0, vDistance));
+      vec3 color = mix(vec3(0.70, 0.79, 0.88), vec3(1.0, 0.99, 0.96), smoothstep(0.1, 0.7, vUv.y));
+      gl_FragColor = vec4(color, alpha); }`,
+  }), [texture]);
+  useEffect(() => () => { geometry.dispose(); material.dispose(); }, [geometry, material]);
+  useFrame((_, delta) => { if (group.current) group.current.position.x = Math.sin(flightState.progress * Math.PI) * 2; });
+  return <group ref={group}><mesh geometry={geometry} material={material} frustumCulled={false} /></group>;
 }
 
 /* ------------------------------------------------------------------- terrain */

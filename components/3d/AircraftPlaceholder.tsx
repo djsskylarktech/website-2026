@@ -3,6 +3,7 @@
 import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
+import { flightState } from "@/lib/flight-store";
 
 /**
  * Vajra, built from the team's own CAD figures.
@@ -46,8 +47,8 @@ export function AircraftPlaceholder({ dimmed = false }: { dimmed?: boolean }) {
         metalness,
       });
     return {
-      balsa: make(PALETTE.balsa, 0.78),
-      ply: make(PALETTE.ply, 0.72),
+      balsa: make("#d9c6a0", 0.48),
+      ply: make("#ad8859", 0.58),
       carbon: make(PALETTE.carbon, 0.45, 0.25),
       blue: make(PALETTE.blue, 0.42, 0.15),
       metal: make(PALETTE.metal, 0.35, 0.75),
@@ -73,25 +74,31 @@ export function AircraftPlaceholder({ dimmed = false }: { dimmed?: boolean }) {
  */
 function Wing({ mats }: { mats: Record<string, THREE.MeshStandardMaterial> }) {
   const geometry = useMemo(() => {
-    const half = SPAN / 2;
-    const c = CENTRE_SPAN / 2;
-    const t = 0.055; // thickness
-
-    // Plan outline, built as an extruded shape so the taper is real geometry.
     const shape = new THREE.Shape();
-    shape.moveTo(-half, -TIP_CHORD * 0.5);
-    shape.lineTo(-c, -ROOT_CHORD * 0.5);
-    shape.lineTo(c, -ROOT_CHORD * 0.5);
-    shape.lineTo(half, -TIP_CHORD * 0.5);
-    shape.lineTo(half, TIP_CHORD * 0.5);
-    shape.lineTo(c, ROOT_CHORD * 0.5);
-    shape.lineTo(-c, ROOT_CHORD * 0.5);
-    shape.lineTo(-half, TIP_CHORD * 0.5);
+    const thickness = (u: number) => 5 * .12 * (.2969 * Math.sqrt(u) - .126 * u - .3516 * u*u + .2843 * u*u*u - .1036 * u*u*u*u);
+    for (let i = 0; i <= 48; i++) {
+      const u = (1 - Math.cos(i / 48 * Math.PI)) / 2;
+      const x = ROOT_CHORD * (.5 - u);
+      const y = ROOT_CHORD * (thickness(u) + .018 * Math.sin(Math.PI * u));
+      if (i === 0) shape.moveTo(x, y); else shape.lineTo(x, y);
+    }
+    for (let i = 48; i >= 0; i--) {
+      const u = (1 - Math.cos(i / 48 * Math.PI)) / 2;
+      shape.lineTo(ROOT_CHORD * (.5-u), ROOT_CHORD * (-thickness(u) + .018 * Math.sin(Math.PI*u)));
+    }
     shape.closePath();
-
-    const geo = new THREE.ExtrudeGeometry(shape, { depth: t, bevelEnabled: false });
-    geo.rotateX(Math.PI / 2);
-    geo.translate(0, t / 2, 0);
+    const geo = new THREE.ExtrudeGeometry(shape, { depth: SPAN, steps: 24, bevelEnabled: false });
+    geo.rotateY(Math.PI / 2);
+    geo.translate(-SPAN / 2, 0, 0);
+    const points = geo.attributes.position;
+    for (let i = 0; i < points.count; i++) {
+      const x = points.getX(i);
+      const taper = Math.max(0, (Math.abs(x) - CENTRE_SPAN / 2) / ((SPAN - CENTRE_SPAN) / 2));
+      const ratio = 1 - taper * (1 - TIP_CHORD / ROOT_CHORD);
+      points.setY(i, points.getY(i) * ratio + Math.abs(x) * .022);
+      points.setZ(i, points.getZ(i) * ratio);
+    }
+    geo.computeVertexNormals();
     return geo;
   }, []);
 
@@ -127,14 +134,14 @@ function Fuselage({ x, mats }: { x: number; mats: Record<string, THREE.MeshStand
   // The props turn. At cruise a real propeller is a disc, but a slow visible
   // rotation reads better than a blur at this scale.
   useFrame((_, delta) => {
-    if (prop.current) prop.current.rotation.z += delta * 14;
+    if (prop.current) prop.current.rotation.z = flightState.progress * 1800;
   });
 
   return (
     <group position={[x, 0.12, 0]}>
       {/* Cargo bay — the whole pod is the payload volume. */}
-      <mesh position={[0, 0, -0.04]} material={mats.balsa}>
-        <boxGeometry args={[0.235, 0.265, POD_LEN]} />
+      <mesh position={[0, 0, -0.04]} rotation={[Math.PI / 2, 0, 0]} material={mats.balsa}>
+        <capsuleGeometry args={[0.118, POD_LEN - .236, 12, 24]} />
       </mesh>
 
       {/* Rounded nose cap. */}

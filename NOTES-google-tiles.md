@@ -47,3 +47,27 @@ Two were already fixed and are worth remembering:
 - `errorThreshold` does not exist on `TilesRenderer`.
 - `ellipsoid.getEastNorthUpFrame(lat, lon, height, target)` takes **four**
   arguments; an older signature took three.
+
+## Update — narrowed further
+
+The 403s in the console were **stale entries**, replayed from earlier page
+loads. With a fetch interceptor installed at module load (so it catches the
+renderer's very first request), a fresh page makes **zero** requests to
+googleapis — nothing is being asked for at all.
+
+So the problem is not authentication. `tiles.update()` is running from
+`useFrame`, but the renderer never issues the root request. Next things to
+check:
+
+1. Whether `apiKey` is actually truthy inside `GoogleCity` — `.env.local` is
+   loaded by Next and the var is `NEXT_PUBLIC_`, so it should be inlined, but
+   this has not been proven at the component itself. Probe it directly.
+2. Whether `tiles.group` ever gets added to the scene: the effect early-returns
+   on `!group.current`, and if the component rendered `null` first (because
+   `failed` latched true from an earlier error) the ref never attaches and the
+   tileset is never parented.
+3. `failed` latches permanently once set and never resets — a single transient
+   error kills the city for the whole session. It should reset when the key or
+   the component changes.
+4. `setCamera()` is called every frame; confirm that is idempotent in v0.5.3
+   rather than re-registering and resetting internal state each frame.

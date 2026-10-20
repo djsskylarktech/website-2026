@@ -8,3 +8,14 @@ build/
 .vercel
 next-env.d.ts
 *.tsbuildinfo
+
+# Original archive stays local; optimized copies in public/legacy are deployed.
+Past Team Photos/
+
+# Local source material; deployment copies live in components/ and public/.
+Elevate1.0-main/
+WhatsApp Unknown 2026-10-17 at 12.14.22 PM/
+reg final proto2.glb
+reg final proto2.SLDASM
+__pycache__/
+*.pyc

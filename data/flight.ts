@@ -31,52 +31,24 @@ export interface FlightScene {
  * The spacing below leaves roughly a third of each gap as clear air.
  */
 export const FLIGHT_SCENES: FlightScene[] = [
-  { id: "start", at: 0.0, span: 0.055, label: "Start", side: "center", size: "md" },
-  { id: "takeoff", at: 0.12, span: 0.04, label: "Takeoff", side: "center", size: "sm" },
-  { id: "climb", at: 0.22, span: 0.042, label: "Climb", side: "right", size: "sm" },
-  { id: "about", at: 0.33, span: 0.045, label: "About", side: "left", size: "lg" },
-  { id: "achievements", at: 0.44, span: 0.045, label: "Achievements", side: "right", size: "lg" },
-  { id: "fleet", at: 0.55, span: 0.045, label: "Aircraft", side: "right", size: "lg" },
-  { id: "engineering", at: 0.66, span: 0.042, label: "Engineering", side: "left", size: "md" },
-  { id: "flight-log", at: 0.755, span: 0.04, label: "Flight log", side: "right", size: "md" },
-  { id: "team", at: 0.84, span: 0.038, label: "Team", side: "left", size: "md" },
-  { id: "sponsors", at: 0.915, span: 0.032, label: "Partners", side: "right", size: "sm" },
-  { id: "join", at: 0.985, span: 0.045, label: "Join", side: "left", size: "lg" },
+  { id: "start", at: 0, span: .055, label: "Start", side: "left", size: "md" },
+  { id: "about", at: .375, span: .025, label: "About", side: "left", size: "lg" },
+  { id: "achievements", at: .435, span: .025, label: "Achievements", side: "right", size: "lg" },
+  { id: "fleet", at: .495, span: .025, label: "Aircraft", side: "left", size: "lg" },
+  { id: "engineering", at: .555, span: .025, label: "Engineering", side: "right", size: "md" },
+  { id: "flight-log", at: .615, span: .025, label: "Flight log", side: "left", size: "md" },
+  { id: "team", at: .675, span: .025, label: "Team", side: "right", size: "md" },
+  { id: "sponsors", at: .735, span: .025, label: "Partners", side: "left", size: "sm" },
+  { id: "join", at: .795, span: .025, label: "Join", side: "right", size: "lg" },
 ];
 
-/**
- * Control points for the flight path, in world units (metres-ish).
- *
- * +X is right, +Y is up, −Z is away from the opening camera. The aircraft
- * starts near the camera facing away down the runway, climbs out, banks left
- * then right through the content sections, and descends to land.
- *
- * These are fed to a Catmull-Rom curve, so the aircraft eases through them
- * rather than running between them in straight lines.
- */
-export const FLIGHT_PATH: [number, number, number][] = [
-  [0, 0.0, 6], // on the ground, close to camera
-  [0, 0.0, -14], // ground roll
-  [0, 1.2, -34], // rotation
-  [0, 7, -58], // initial climb
-  [-3, 14, -86], // climb out, drifting left
-  [-16, 19, -116], // bank left  → About panel opens right of frame
-  [-6, 21, -150], // levelling
-  [18, 22, -184], // bank right → Achievements
-  [24, 23, -220], // Aircraft / fleet
-  [6, 24, -256], // Engineering
-  [-18, 23, -292], // Flight log
-  [-10, 21, -326], // Team
-  [4, 16, -360], // descent begins, Sponsors
-  [2, 7, -392], // final approach
-  [0, 0.6, -418], // flare
-  [0, 0.0, -440], // rollout
-];
-
-/** Bank angle in radians at each control point, interpolated along the path. */
-export const FLIGHT_BANK: number[] = [
-  0, 0, 0, -0.04, -0.12, -0.42, -0.1, 0.44, 0.28, -0.18, -0.38, 0.06, 0.3, 0.1, 0, 0,
-];
+// Vertical phases and section placement are sampled in lib/flight-route.ts.
+export const CRUISE_ALTITUDE = 32;
+export const TAKEOFF_START = 0.12;
+export const CRUISE_START = 0.30;
+export const LANDING_START = 0.83;
+export const TOUCHDOWN_AT = 0.965;
+export const ARRIVAL_RUNWAY_Z = -800;
 
 /**
  * How far behind and above the aircraft the camera rides, by progress.
@@ -96,4 +68,4 @@ export const CAMERA_RIG = {
 };
 
 /** Total scroll length of the homepage, in viewport heights. */
-export const FLIGHT_SCROLL_VH = 900;
+export const FLIGHT_SCROLL_VH = 1200;

@@ -67,6 +67,7 @@ export function FlightPanel({ scene, children, side, className = "" }: FlightPan
       // Below a threshold the panel should not intercept clicks or be read by
       // a screen reader while it is effectively not on screen.
       el.style.pointerEvents = presence > 0.5 ? "auto" : "none";
+      el.inert = presence <= 0.5;
       el.setAttribute("aria-hidden", presence > 0.15 ? "false" : "true");
     });
   }, [config]);
@@ -87,13 +88,15 @@ export function FlightPanel({ scene, children, side, className = "" }: FlightPan
     // revealed by presence, so they must stack rather than flow. The top inset
     // clears the fixed navbar so a tall panel never runs under it.
     <div
-      className="pointer-events-none absolute inset-x-0 bottom-0 flex items-center"
+      className="flight-panel-slot pointer-events-none absolute inset-x-0 bottom-0 flex items-center"
       style={{ top: "var(--nav-h)" }}
       data-scene={scene}
     >
       <div
         ref={ref}
-        className={`scrim ${resolvedSide === "right" ? "scrim-right" : ""} pointer-events-none relative flex w-full flex-col ${SIDE_CLASS[resolvedSide]} ${SIZE_CLASS[config.size]} ${className}`}
+        aria-hidden={config.id !== "start"}
+        inert={config.id !== "start"}
+        className={`flight-panel scrim ${resolvedSide === "right" ? "scrim-right" : ""} pointer-events-none relative flex w-full flex-col ${SIDE_CLASS[resolvedSide]} ${SIZE_CLASS[config.size]} ${className}`}
         style={{ opacity: 0 }}
       >
         {children}

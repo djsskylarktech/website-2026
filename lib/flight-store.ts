@@ -11,6 +11,9 @@
 export interface FlightState {
   /** 0 → 1 across the whole homepage flight. */
   progress: number;
+  altitude: number;
+  cityStatus: "loading" | "ready" | "unavailable";
+  cityCredits: string;
   /** Scroll velocity, used to add a little aerodynamic lead to the camera. */
   velocity: number;
   /** True once the 3D scene has taken over from the loading state. */
@@ -21,6 +24,9 @@ export interface FlightState {
 
 export const flightState: FlightState = {
   progress: 0,
+  altitude: 0,
+  cityStatus: "loading",
+  cityCredits: "",
   velocity: 0,
   ready: false,
   reducedMotion: false,

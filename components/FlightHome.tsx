@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { FlightScroll } from "@/components/FlightScroll";
+import { FlightIntro } from "@/components/FlightIntro";
+import { FlightAudio } from "@/components/FlightAudio";
 import { FlightScene } from "@/components/3d/FlightScene";
 import { GoogleCityAttribution } from "@/components/3d/GoogleCity";
 import { FlightPanel, FlightPanelLayer } from "@/components/content/FlightPanel";
@@ -27,6 +30,7 @@ import { StaticHome } from "./StaticHome";
  */
 export function FlightHome() {
   const tier = useCapability();
+  const [showStory, setShowStory] = useState(true);
 
   // Reduced motion and weak devices get an ordinary, fully readable page rather
   // than a degraded version of the flight.
@@ -42,17 +46,15 @@ export function FlightHome() {
   return (
     <>
       <FlightScroll enabled />
+      <FlightAudio />
       <FlightScene tier={tier} />
+      <FlightIntro />
       <Navbar overFlight />
-      <FlightTelemetry />
-      {/* Required wherever Google tiles are shown. Off while the city is
-          disabled — crediting imagery that is not on screen is just wrong. */}
-      {false ? <GoogleCityAttribution apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY} /> : null}
+      <FlightTelemetry showStory={showStory} onToggleStory={() => setShowStory(value => !value)} />
+      <GoogleCityAttribution apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY} />
 
-      <FlightPanelLayer>
+      {showStory ? <FlightPanelLayer>
         <Opening />
-        <Takeoff />
-        <Climb />
         <About />
         <Achievements />
         <Fleet />
@@ -61,7 +63,7 @@ export function FlightHome() {
         <Team />
         <Sponsors />
         <Join />
-      </FlightPanelLayer>
+      </FlightPanelLayer> : null}
 
       {/* The scroll driver. Its only job is to give the page length for the
           flight to be read from; all content sits in the fixed layer above. */}
@@ -120,7 +122,7 @@ function Opening() {
           href="/sponsors"
           className="label-meta border border-white/30 px-5 py-3 text-ivory-100 transition-colors hover:border-ember-500 hover:text-ember-500"
         >
-          Sponsorship deck
+          Partner with us
         </Link>
       </div>
 
@@ -128,33 +130,6 @@ function Opening() {
         <span className="inline-block h-px w-10 bg-ember-500" />
         Scroll to take off
       </p>
-    </FlightPanel>
-  );
-}
-
-function Takeoff() {
-  return (
-    <FlightPanel scene="takeoff" side="left">
-      <p className="h-heading max-w-xl leading-tight">
-        Every aircraft here was designed, built and flown
-        <span className="text-ember-500"> by students.</span>
-      </p>
-    </FlightPanel>
-  );
-}
-
-function Climb() {
-  return (
-    <FlightPanel scene="climb">
-      <h2 className="h-display leading-[0.82]">
-        Design.
-        <br />
-        Build.
-        <br />
-        Test.
-        <br />
-        <span className="text-ember-500">Fly.</span>
-      </h2>
     </FlightPanel>
   );
 }
