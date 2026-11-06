@@ -6,7 +6,7 @@ export default function SponsorsPage() {
   return (
     <main className="min-h-screen bg-[#11191d] px-[5vw] py-8 text-[#f2f0e9]">
       <header className="mx-auto flex max-w-[1500px] items-center justify-between border-b border-white/20 pb-6 text-sm">
-        <Link href="/" className="font-semibold tracking-tight">DJS SKYLARK</Link>
+        <Link href="/"><img src="/brand/djs-skylark-official-light.png" alt="DJS Skylark home" className="h-14 w-auto" /></Link>
         <Link href="/" className="text-[#b2c5c5] hover:text-white">← Back to home</Link>
       </header>
       <section className="mx-auto max-w-[1500px] pt-[clamp(100px,15vw,220px)]">

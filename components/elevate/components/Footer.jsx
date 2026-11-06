@@ -1,5 +1,4 @@
 import { EVENT, ORGANISER } from "../config";
-import BrandWordmark from "./BrandWordmark";
 import Link from "next/link";
 
 // the venue's Google Maps embed — same pin as the footer's "Location" link,
@@ -16,7 +15,7 @@ export default function Footer() {
             {/* drop the committee logo at public/nsdc-logo.png and it appears
                 here; until the file exists the mark is simply omitted */}
             <div className="footer__brand">
-              <BrandWordmark uppercase />
+              <img src="/brand/djs-skylark-official-light.png" alt="DJS Skylark" className="footer__official-logo" loading="lazy" decoding="async" />
             </div>
           </div>
           <p className="footer__tag">{ORGANISER.blurb}</p>

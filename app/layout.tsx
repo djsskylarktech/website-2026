@@ -56,6 +56,7 @@ export const metadata: Metadata = {
       "Three classes, one team. Design, build, test and fly — the aircraft, the engineering and the people behind them.",
   },
   robots: { index: true, follow: true },
+  icons: { icon: "/brand/djs-skylark-official.png" },
 };
 
 export const viewport: Viewport = {

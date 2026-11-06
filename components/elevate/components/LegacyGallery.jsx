@@ -6,11 +6,10 @@ import archive from "../legacy-media.json";
 import selection from "../legacy-selection.json";
 import "./legacy.css";
 
-const highlights = archive.flatMap((season) =>
-  season.media
-    .filter((_, index) => selection[season.folder]?.includes(index + 1))
-    .map((item) => ({ ...item, year: season.label }))
-);
+const seasons = archive.map((season) => ({
+  ...season,
+  media: season.media.filter((_, index) => selection[season.folder]?.includes(index + 1)).slice(0, 8),
+})).filter((season) => season.media.length);
 
 function mediaImage(item) {
   return item.thumb || (item.type === "video" ? item.poster : item.src);
@@ -21,9 +20,21 @@ function mediaSrcSet(item) {
 }
 
 export default function LegacyGallery() {
+  const [seasonIndex, setSeasonIndex] = useState(0);
   const [activeIndex, setActiveIndex] = useState(null);
+  const [compact, setCompact] = useState(false);
   const root = useRef(null);
-  const active = activeIndex === null ? null : highlights[activeIndex];
+  const season = seasons[seasonIndex];
+  const visibleMedia = season.media.slice(0, compact ? 4 : 8);
+  const active = activeIndex === null ? null : visibleMedia[activeIndex];
+
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 650px)");
+    const update = () => { setCompact(query.matches); setActiveIndex(null); };
+    update();
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(([entry]) => {
@@ -42,15 +53,15 @@ export default function LegacyGallery() {
     document.body.style.overflow = "hidden";
     const onKey = (event) => {
       if (event.key === "Escape") setActiveIndex(null);
-      if (event.key === "ArrowRight") setActiveIndex((index) => (index + 1) % highlights.length);
-      if (event.key === "ArrowLeft") setActiveIndex((index) => (index - 1 + highlights.length) % highlights.length);
+      if (event.key === "ArrowRight") setActiveIndex((index) => (index + 1) % visibleMedia.length);
+      if (event.key === "ArrowLeft") setActiveIndex((index) => (index - 1 + visibleMedia.length) % visibleMedia.length);
     };
     window.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = priorOverflow;
       window.removeEventListener("keydown", onKey);
     };
-  }, [activeIndex]);
+  }, [activeIndex, visibleMedia.length]);
 
   return (
     <section ref={root} className="jx legacy" id="legacy" aria-labelledby="legacy-title">
@@ -61,19 +72,32 @@ export default function LegacyGallery() {
           <p>Years of building, testing and travelling together. A look back through the team’s own photographs and films.</p>
         </div>
 
-        <div className="legacy__gallery-label">Selected moments <span>2016 — 2025</span></div>
-        <div className="legacy__grid">
-          {highlights.map((item, index) => (
+        <div className="legacy__gallery-label">Selected moments <span>Choose a year</span></div>
+        <div className="legacy__years" role="group" aria-label="Archive years">
+          {seasons.map((entry, index) => (
             <button
               type="button"
-              className={`legacy__item${index === 0 ? " legacy__item--first" : ""}`}
+              key={entry.folder}
+              className={index === seasonIndex ? "is-active" : ""}
+              aria-pressed={index === seasonIndex}
+              onClick={() => { setSeasonIndex(index); setActiveIndex(null); }}
+            >
+              {entry.label}
+            </button>
+          ))}
+        </div>
+        <div className="legacy__grid" key={season.folder}>
+          {visibleMedia.map((item, index) => (
+            <button
+              type="button"
+              className="legacy__item"
               key={item.src}
               onClick={() => setActiveIndex(index)}
-              aria-label={`Open ${item.type === "video" ? "video" : "photo"} from ${item.year}`}
+              aria-label={`Open ${item.type === "video" ? "video" : "photo"} from ${season.label}`}
             >
-              <img src={mediaImage(item)} srcSet={mediaSrcSet(item)} sizes={index === 0 ? "(max-width: 650px) 100vw, 50vw" : "(max-width: 650px) 50vw, (max-width: 900px) 33vw, 25vw"} alt={`DJS Skylark archive, ${item.year}`} loading="lazy" decoding="async" />
+              <img src={mediaImage(item)} srcSet={mediaSrcSet(item)} sizes="(max-width: 650px) 50vw, (max-width: 900px) 33vw, 25vw" alt={`DJS Skylark archive, ${season.label}`} loading="lazy" decoding="async" />
               <span className="legacy__item-shade" />
-              <span className="legacy__item-number">{item.year}</span>
+              <span className="legacy__item-number">{season.label}</span>
               {item.type === "video" && <span className="legacy__play" aria-hidden="true">▶</span>}
               <span className="legacy__item-kind">{item.type === "video" ? "FILM" : "PHOTO"}</span>
             </button>
@@ -84,7 +108,7 @@ export default function LegacyGallery() {
       {active && createPortal((
         <div className="legacy__viewer" role="dialog" aria-modal="true" aria-label="Team archive viewer" onClick={() => setActiveIndex(null)}>
           <div className="legacy__viewer-top">
-            <span>DJS SKYLARK / {active.year} <span>·</span> {String(activeIndex + 1).padStart(2, "0")} / {String(highlights.length).padStart(2, "0")}</span>
+            <span>DJS SKYLARK / {season.label} <span>·</span> {String(activeIndex + 1).padStart(2, "0")} / {String(visibleMedia.length).padStart(2, "0")}</span>
             <button type="button" className="legacy__close" onClick={() => setActiveIndex(null)} aria-label="Close viewer">Close <span aria-hidden="true">×</span></button>
           </div>
           <div className="legacy__viewer-media" onClick={(event) => event.stopPropagation()}>
@@ -94,13 +118,13 @@ export default function LegacyGallery() {
                 {active.fallback && <source src={active.fallback} type="video/mp4" />}
               </video>
             ) : (
-              <img key={active.src} src={active.src} alt={`DJS Skylark archive, ${active.year}`} decoding="async" />
+              <img key={active.src} src={active.src} alt={`DJS Skylark archive, ${season.label}`} decoding="async" />
             )}
           </div>
           <div className="legacy__viewer-bottom" onClick={(event) => event.stopPropagation()}>
-            <button type="button" onClick={() => setActiveIndex((activeIndex - 1 + highlights.length) % highlights.length)} aria-label="Previous item">← Previous</button>
+            <button type="button" onClick={() => setActiveIndex((activeIndex - 1 + visibleMedia.length) % visibleMedia.length)} aria-label="Previous item">← Previous</button>
             <span>{active.type === "video" ? "ARCHIVE FILM" : "ARCHIVE PHOTOGRAPH"}</span>
-            <button type="button" onClick={() => setActiveIndex((activeIndex + 1) % highlights.length)} aria-label="Next item">Next →</button>
+            <button type="button" onClick={() => setActiveIndex((activeIndex + 1) % visibleMedia.length)} aria-label="Next item">Next →</button>
           </div>
         </div>
       ), document.body)}

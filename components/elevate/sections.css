@@ -503,6 +503,9 @@
   color: var(--gold);
 }
 
+.footer__official-logo { display: block; width: clamp(150px, 16vw, 230px); height: auto; }
+.bp__official-logo { display: block; width: min(100%, 180px); height: auto; margin: 0 auto 8px; }
+
 .footer__tag {
   line-height: 1.6;
 }
