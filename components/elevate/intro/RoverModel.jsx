@@ -2,12 +2,21 @@
 
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
-import { Box3, MathUtils, Vector3 } from "three";
+import { Box3, Euler, Quaternion, Vector3 } from "three";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import modelAsset from "../model-asset.json";
 
 const MODEL_URL = modelAsset.url;
-const REST_YAW = -0.38;
+// The source export points its tail toward the original camera angle.
+const FRONT_VIEW = new Quaternion().setFromEuler(new Euler(0, Math.PI - 0.38, 0));
+
+function trackballPoint(event, element) {
+  const rect = element.getBoundingClientRect();
+  const x = (2 * (event.clientX - rect.left)) / rect.width - 1;
+  const y = 1 - (2 * (event.clientY - rect.top)) / rect.height;
+  const radius = x * x + y * y;
+  return new Vector3(x, y, radius < 1 ? Math.sqrt(1 - radius) : 0).normalize();
+}
 
 export function preloadRoverModel() {
   useGLTF.preload(MODEL_URL, false, true);
@@ -44,78 +53,60 @@ function Rover({ target, invalidateRef }) {
 
   useFrame((_, delta) => {
     if (!group.current) return;
-    const rotation = group.current.rotation;
-    const pitch = target.current.pitch;
-    const yaw = REST_YAW + target.current.yaw;
-    const roll = target.current.roll;
-    const step = Math.min(delta, 0.05);
-    rotation.x = MathUtils.damp(rotation.x, pitch, 7, step);
-    rotation.y = MathUtils.damp(rotation.y, yaw, 7, step);
-    rotation.z = MathUtils.damp(rotation.z, roll, 7, step);
-    if (Math.abs(rotation.x - pitch) + Math.abs(rotation.y - yaw) + Math.abs(rotation.z - roll) > 0.001) {
-      invalidate();
-    }
+    group.current.quaternion.slerp(target.current, 1 - Math.exp(-10 * Math.min(delta, 0.05)));
+    if (group.current.quaternion.angleTo(target.current) > 0.001) invalidate();
   });
 
   return (
-    <group ref={group} scale={scale} rotation={[0, REST_YAW, 0]}>
+    <group ref={group} scale={scale} quaternion={FRONT_VIEW}>
       <primitive object={scene} position={center.map((v) => -v)} />
     </group>
   );
 }
 
 export default function RoverModel() {
-  const target = useRef({ pitch: 0, yaw: 0, roll: 0 });
+  const target = useRef(FRONT_VIEW.clone());
+  const orientation = useRef(FRONT_VIEW.clone());
   const invalidateRef = useRef(null);
   const dragging = useRef(null);
-  const lastScroll = useRef(0);
   const [isDragging, setIsDragging] = useState(false);
 
-  useEffect(() => {
-    const onScroll = () => {
-      lastScroll.current = performance.now();
-      if (dragging.current) {
-        dragging.current = null;
-        setIsDragging(false);
-      }
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  const update = (pitch, yaw, roll) => {
-    target.current = { pitch, yaw, roll };
+  const update = (hover = new Quaternion()) => {
+    target.current.copy(orientation.current).multiply(hover);
     invalidateRef.current?.();
   };
 
   const onPointerMove = (event) => {
-    if (event.pointerType === "touch" || performance.now() - lastScroll.current < 180) return;
     if (dragging.current) {
       const drag = dragging.current;
-      update(
-        MathUtils.clamp(drag.pitch + (event.clientY - drag.y) * 0.004, -0.45, 0.45),
-        MathUtils.clamp(drag.yaw + (event.clientX - drag.x) * 0.006, -1.05, 1.05),
-        0,
-      );
+      if (event.pointerId !== drag.pointerId) return;
+      const next = trackballPoint(event, event.currentTarget);
+      const turn = new Quaternion().setFromUnitVectors(drag.point, next);
+      orientation.current.premultiply(turn).normalize();
+      drag.point = next;
+      update();
       return;
     }
+    if (event.pointerType === "touch") return;
     const rect = event.currentTarget.getBoundingClientRect();
-    const x = MathUtils.clamp((event.clientX - rect.left) / rect.width * 2 - 1, -1, 1);
-    const y = MathUtils.clamp((event.clientY - rect.top) / rect.height * 2 - 1, -1, 1);
-    update(-y * 0.13, x * 0.32, -x * 0.045);
+    const x = (event.clientX - rect.left) / rect.width * 2 - 1;
+    const y = (event.clientY - rect.top) / rect.height * 2 - 1;
+    update(new Quaternion().setFromEuler(new Euler(-y * 0.06, x * 0.1, 0)));
   };
 
   const onPointerDown = (event) => {
-    if (event.pointerType === "touch" || performance.now() - lastScroll.current < 180) return;
-    dragging.current = { x: event.clientX, y: event.clientY, pitch: target.current.pitch, yaw: target.current.yaw };
+    if (event.button !== 0 || dragging.current) return;
+    dragging.current = { pointerId: event.pointerId, point: trackballPoint(event, event.currentTarget) };
     event.currentTarget.setPointerCapture(event.pointerId);
     setIsDragging(true);
   };
 
   const onPointerUp = (event) => {
+    if (dragging.current?.pointerId !== event.pointerId) return;
     dragging.current = null;
     setIsDragging(false);
     if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+    update();
   };
 
   return (
@@ -123,22 +114,25 @@ export default function RoverModel() {
       className={`jx-rover-model${isDragging ? " jx-rover-model--dragging" : ""}`}
       role="group"
       tabIndex={0}
-      aria-label="Interactive Skylark aircraft model. Move the mouse to tilt, drag to rotate, or use arrow keys when focused."
+      aria-label="Interactive Skylark aircraft model. Drag in any direction to rotate, or use arrow keys and Q and E when focused. Press R to reset the front view."
       onPointerMove={onPointerMove}
       onPointerDown={onPointerDown}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
-      onPointerLeave={() => { if (!dragging.current) update(0, 0, 0); }}
-      onBlur={() => update(0, 0, 0)}
+      onPointerLeave={() => { if (!dragging.current) update(); }}
+      onBlur={() => update()}
       onKeyDown={(event) => {
-        if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)) return;
+        if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "q", "e", "r"].includes(event.key)) return;
         event.preventDefault();
-        const { pitch, yaw } = target.current;
-        update(
-          MathUtils.clamp(pitch + (event.key === "ArrowUp" ? -0.12 : event.key === "ArrowDown" ? 0.12 : 0), -0.45, 0.45),
-          MathUtils.clamp(yaw + (event.key === "ArrowLeft" ? -0.18 : event.key === "ArrowRight" ? 0.18 : 0), -1.05, 1.05),
-          0,
-        );
+        if (event.key === "r") orientation.current.copy(FRONT_VIEW);
+        else {
+          const axis = event.key === "q" || event.key === "e" ? new Vector3(0, 0, 1)
+            : event.key === "ArrowUp" || event.key === "ArrowDown" ? new Vector3(1, 0, 0)
+            : new Vector3(0, 1, 0);
+          const sign = ["ArrowUp", "ArrowRight", "e"].includes(event.key) ? 1 : -1;
+          orientation.current.premultiply(new Quaternion().setFromAxisAngle(axis, sign * 0.16));
+        }
+        update();
       }}
     >
       <Canvas
@@ -156,7 +150,7 @@ export default function RoverModel() {
           <Rover target={target} invalidateRef={invalidateRef} />
         </Suspense>
       </Canvas>
-      <span className="jx-rover-model__hint" aria-hidden="true">Move to explore <span>·</span> Drag to rotate</span>
+      <span className="jx-rover-model__hint" aria-hidden="true">Drag to rotate freely <span>·</span> R to reset</span>
     </div>
   );
 }

@@ -1382,6 +1382,7 @@ html.in-jet .arriving {
   pointer-events: auto;
   cursor: grab;
   outline: none;
+  touch-action: none;
 }
 
 .jx-rover-model--dragging {
@@ -1549,7 +1550,7 @@ html.in-jet .arriving {
     transform: none;
   }
   .jx-rover-model {
-    pointer-events: none;
+    pointer-events: auto;
   }
   .jx-rover-model__hint {
     display: none;
