@@ -5,6 +5,7 @@ import { BackPlate, FrontPlate, FrontOverPlate, Knob } from "./CabinWindow";
 import { paintSky } from "./skyPainter";
 import { prefersReducedMotion } from "../hooks/useInView";
 import { EVENT } from "../config";
+import SocialLinks from "../components/SocialLinks";
 
 const VISITED = "skylark-intro-seen";
 
@@ -342,6 +343,7 @@ export default function Intro() {
                 </div>
               </div>
             </div>
+            <SocialLinks className="jx-hero-social" />
           </div>
         </section>
 

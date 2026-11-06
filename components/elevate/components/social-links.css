@@ -1,0 +1,9 @@
+.skylark-social { display: flex; gap: 8px; }
+.skylark-social a { display: inline-flex; align-items: center; gap: 8px; min-height: 42px; padding: 9px 12px; border: 1px solid rgba(255,255,255,.38); border-radius: 999px; background: rgba(19,25,28,.64); color: #fff; font-size: 13px; font-weight: 600; line-height: 1; text-decoration: none; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: background .2s ease, border-color .2s ease, transform .2s ease; }
+.skylark-social a:hover { background: rgba(19,25,28,.88); border-color: #fff; transform: translateY(-2px); }
+.skylark-social a:focus-visible { outline: 2px solid #d5aa68; outline-offset: 3px; }
+.skylark-social svg { width: 17px; height: 17px; flex: 0 0 auto; }
+.skylark-social__arrow { margin-left: 4px; opacity: .7; font-size: 16px; }
+.jx-hero-social { position: absolute; z-index: 6; right: max(24px, 4vw); bottom: 32px; }
+.footer__social .skylark-social a { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.2); }
+@media (max-width: 700px) { .jx-hero-social { right: 16px; bottom: 90px; } .jx-hero-social a { width: 42px; justify-content: center; padding: 9px; } .jx-hero-social a span { display: none; } }

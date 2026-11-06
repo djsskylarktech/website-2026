@@ -1,5 +1,6 @@
 import { EVENT, ORGANISER } from "../config";
 import Link from "next/link";
+import SocialLinks from "./SocialLinks";
 
 // the venue's Google Maps embed — same pin as the footer's "Location" link,
 // shown in place rather than as another tab to lose people to
@@ -19,7 +20,7 @@ export default function Footer() {
             </div>
           </div>
           <p className="footer__tag">{ORGANISER.blurb}</p>
-          <div className="footer__social" />
+          <div className="footer__social"><SocialLinks /></div>
         </div>
 
         <div className="footer__col">
