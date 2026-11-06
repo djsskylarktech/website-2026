@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Manrope, Sora, Roboto_Mono } from "next/font/google";
 import "@/styles/globals.css";
+import "@/styles/subpages.css";
 
 /**
  * Type system.

@@ -37,6 +37,8 @@ Never commit `.env.local` or API keys. `NEXT_PUBLIC_` variables are embedded in 
 - `components/elevate/` contains the homepage sections, flight animation, gallery, and styles.
 - `components/elevate/intro/RoverModel.jsx` controls the interactive aircraft. `LazyRover.jsx` loads its 3D code near the section, and `model-asset.json` points to the compressed, versioned asset in `public/models/`.
 - `components/elevate/legacy-media.json` lists the media in `public/legacy/`.
+- `components/elevate/legacy-selection.json` chooses the photos and films visitors actually see; entries are one-based positions in the media manifest for each year.
+- `public/images/intro/cloudscape-v2.webp` is the generated cloud plate shared by the cabin window and flight-record section.
 - `app/` contains route pages and metadata.
 - `data/` contains aircraft, results, and flight content.
 

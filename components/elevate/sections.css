@@ -1537,3 +1537,20 @@
 .sponsors__logo--obliq { width: min(100%, 136px); height: 2.8rem; object-fit: cover; object-position: 50% 56%; }
 .sponsors__card--featured { padding: 1.8rem 1rem; background: #fffdfa; }
 .sponsors__card--featured .sponsors__logo { height: 4.5rem; max-width: min(100%, 320px); }
+
+/* One typographic voice for the flight record. */
+.bp__ticket, .bp__stub { font-family: "Inter", Arial, sans-serif; }
+.bp__qr--brand { gap: .85rem; text-align: center; }
+.bp__brandMark { font-family: "Archivo", Arial, sans-serif; font-size: clamp(1.25rem, 2.2vw, 2.1rem); font-weight: 700; letter-spacing: -.055em; line-height: 1; }
+.bp__brandNote { font-size: .58rem; line-height: 1.55; letter-spacing: .1em; text-transform: uppercase; color: #768683; }
+.bp__city { font-size: clamp(.7rem, 1vw, .82rem); font-weight: 600; line-height: 1.35; }
+.bp__code { font-family: "Archivo", Arial, sans-serif; font-size: clamp(2.1rem, 4.4vw, 3.45rem); font-weight: 650; letter-spacing: -.065em; }
+.bp__when, .bp__rows dt { font-size: .65rem; color: #71817e; }
+.bp__rows dd { font-size: clamp(.68rem, 1vw, .86rem); font-weight: 650; letter-spacing: -.025em; }
+.bp__stubTitle, .bp__stubBrand { font-family: "Inter", Arial, sans-serif; font-size: .63rem; letter-spacing: .11em; }
+.bp__stub { background: #263d3e; }
+.bp__stub::before { background: radial-gradient(circle 4px at 5px 6px, #263d3e 98%, transparent) 0 0 / 10px 12px repeat-y; }
+@media (max-width: 760px) {
+  .bp__brandMark { font-size: 1.2rem; }
+  .bp__code { font-size: clamp(1.7rem, 7vw, 2.5rem); }
+}

@@ -36,22 +36,14 @@ export function Navbar({ overFlight = false }: { overFlight?: boolean }) {
 
   return (
     <header
-      className="fixed inset-x-0 top-0 z-40 h-[var(--nav-h)]"
-      style={{
-        background: overFlight
-          ? "linear-gradient(to bottom, rgb(5 10 31 / 0.82), transparent)"
-          : "rgb(5 10 31 / 0.92)",
-        backdropFilter: overFlight ? undefined : "blur(8px)",
-      }}
+      className="subnav fixed inset-x-0 top-0 z-40 h-[var(--nav-h)]"
     >
       <nav
         aria-label="Primary"
-        className="mx-auto flex h-full max-w-[1600px] items-center justify-between px-[4vw]"
+        className="mx-auto flex h-full max-w-[1600px] items-center justify-between gap-6 px-[4vw]"
       >
         <Link href="/" className="flex items-baseline gap-2.5 no-underline">
-          <span className="text-sub font-semibold tracking-tight text-ivory-50">
-            DJS SKYLARK
-          </span>
+          <span className="subnav__brand text-sub font-semibold tracking-tight">DJS SKYLARK</span>
           <span className="label-meta hidden sm:inline">Aero Design · DJSCE</span>
         </Link>
 
@@ -59,7 +51,7 @@ export function Navbar({ overFlight = false }: { overFlight?: boolean }) {
           className="flex items-center gap-7 transition-opacity duration-500 ease-flight"
           style={{ opacity: revealed ? 1 : 0, pointerEvents: revealed ? "auto" : "none" }}
         >
-          <ul className="hidden items-center gap-7 lg:flex">
+          <ul className="subnav__links hidden items-center gap-7 lg:flex">
             {LINKS.map((link) => (
               <li key={link.href}>
                 <Link

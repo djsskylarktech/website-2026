@@ -24,7 +24,7 @@ export default function FlightLogPage() {
     <>
       <Navbar />
 
-      <main id="main" className="pt-[var(--nav-h)]">
+      <main id="main" className="subpage pt-[var(--nav-h)]">
         <section className="mx-auto max-w-[1500px] px-[5vw] py-14 lg:py-20">
           <div className="flex items-center gap-3">
             <span className="h-3 w-3 bg-ember-500" />
@@ -119,40 +119,17 @@ function Field({
  * doubles as the brief for collecting entries from test days.
  */
 function EmptyLog() {
-  const fields = [
-    ["Date", "When the test ran"],
-    ["Aircraft", "Vajra, Tejas or Garuda"],
-    ["Test / flight number", "e.g. Test Flight 07"],
-    ["What we changed", "The modification under test"],
-    ["Why", "What problem it was meant to solve"],
-    ["What happened", "Observed behaviour in the air"],
-    ["What broke", "Left blank if nothing did"],
-    ["What we learned", "The engineering conclusion"],
-    ["What we changed next", "What it led to"],
-    ["Result", "Outcome, and the number proving it"],
-  ];
-
   return (
-    <div className="border border-dashed border-ember-500/35 p-8 sm:p-12">
-      <p className="label-meta text-ember-300">No entries yet</p>
+    <div className="border-t border-white/[0.1] py-10">
+      <p className="label-meta text-ember-300">Flight record</p>
       <h2 className="h-heading mt-3 max-w-2xl">
-        This log is written from real test days, not from the design reports.
+        Field notes are being assembled from real test days.
       </h2>
       <p className="prose-skylark mt-4">
-        A design report says what an aircraft was intended to do. A flight log says what it did.
-        Nothing is published here until the team supplies real entries — add them to{" "}
-        <code className="font-mono text-ivory-100">data/team.ts</code> and they appear in this
-        layout automatically.
+        Each entry will pair the change made to an aircraft with what actually happened in the air.
+        Until those records are ready, explore the design work behind the fleet.
       </p>
-
-      <dl className="mt-10 grid gap-x-10 gap-y-3 sm:grid-cols-2">
-        {fields.map(([label, hint]) => (
-          <div key={label} className="flex items-baseline gap-4 border-b border-white/[0.09] py-2">
-            <dt className="label-meta w-[11rem] shrink-0">{label}</dt>
-            <dd className="text-caption text-slate-400">{hint}</dd>
-          </div>
-        ))}
-      </dl>
+      <a href="/engineering" className="link-action mt-8 inline-block">Explore engineering →</a>
     </div>
   );
 }

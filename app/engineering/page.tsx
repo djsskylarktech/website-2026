@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Navbar } from "@/components/navigation/Navbar";
-import { PlaceholderBlock } from "@/components/ui/Placeholder";
 import { disciplines, PROCESS } from "@/data/engineering";
 
 export const metadata = {
@@ -22,7 +21,7 @@ export default function EngineeringPage() {
     <>
       <Navbar />
 
-      <main id="main" className="pt-[var(--nav-h)]">
+      <main id="main" className="subpage pt-[var(--nav-h)]">
         <section className="mx-auto max-w-[1500px] px-[5vw] py-14 lg:py-20">
           <div className="flex items-center gap-3">
             <span className="h-3 w-3 bg-ember-500" />
@@ -93,21 +92,6 @@ export default function EngineeringPage() {
                 )}
               </article>
             ))}
-          </div>
-        </section>
-
-        {/* --- Figures ------------------------------------------------------ */}
-        <section className="mx-auto max-w-[1500px] px-[5vw] pb-20">
-          <h2 className="label-meta text-ember-500">Figures from the design reports</h2>
-          <p className="prose-skylark mt-3 text-caption">
-            CFD plots, FEA results, trade studies, V-n diagrams and wind tunnel photographs live
-            here once exported from the reports.
-          </p>
-          <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            <PlaceholderBlock kind="image" note="CFD pressure plot" aspect="4 / 3" />
-            <PlaceholderBlock kind="image" note="FEA stress result" aspect="4 / 3" />
-            <PlaceholderBlock kind="image" note="Trade study chart" aspect="4 / 3" />
-            <PlaceholderBlock kind="image" note="Wind tunnel test" aspect="4 / 3" />
           </div>
         </section>
 

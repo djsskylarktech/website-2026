@@ -3,10 +3,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Navbar } from "@/components/navigation/Navbar";
 import { SpecList, SpecFigure } from "@/components/ui/SpecList";
-import { PlaceholderBlock } from "@/components/ui/Placeholder";
 import { FigureGrid } from "@/components/content/FigureGrid";
 import { figuresFor } from "@/data/figures";
-import { AircraftViewer } from "@/components/3d/AircraftViewer";
 import { aircraft, aircraftBySlug } from "@/data/aircraft";
 import { VALUE_KIND_LABEL } from "@/data/types";
 
@@ -48,12 +46,17 @@ export default async function AircraftPage({
   const others = aircraft.filter((x) => x.slug !== a.slug);
   const plates = figuresFor(a.slug);
   const measured = a.specs.filter((s) => s.value === null);
+  const archiveImage = {
+    vajra: "/legacy/2025/photo-06.webp",
+    tejas: "/legacy/2025/photo-12.webp",
+    garuda: "/legacy/2025/photo-10.webp",
+  }[a.slug];
 
   return (
     <>
       <Navbar />
 
-      <main id="main" className="pt-[var(--nav-h)]">
+      <main id="main" className="subpage pt-[var(--nav-h)]">
         {/* --- Hero: the aircraft, large ------------------------------------ */}
         <section className="relative border-b border-white/[0.1]">
           <div className="mx-auto grid max-w-[1500px] gap-8 px-[5vw] py-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] lg:items-center lg:py-20">
@@ -82,16 +85,12 @@ export default async function AircraftPage({
               </dl>
             </div>
 
-            {/* The model, free-orbiting. Falls back to the schematic stand-in
-                until a real export is dropped in. */}
-            <div className="relative aspect-[4/3] w-full bg-navy-800">
-              <AircraftViewer src={a.model} placeholder={a.modelIsPlaceholder} />
-              {a.modelIsPlaceholder ? (
-                <p className="is-placeholder absolute bottom-3 left-3 px-2 py-1">
-                  [ADD GLB] schematic stand-in — not the real {a.name}
-                </p>
-              ) : null}
-            </div>
+            <figure className="relative aspect-[4/3] w-full overflow-hidden bg-[#d7dfd8]">
+              <img src={archiveImage} alt="A DJS Skylark aircraft from the team archive" className="h-full w-full object-cover" />
+              <figcaption className="absolute bottom-0 left-0 bg-[#273836]/85 px-4 py-2 text-xs tracking-wide text-white">
+                Skylark aircraft archive · 2025
+              </figcaption>
+            </figure>
           </div>
         </section>
 
@@ -193,18 +192,7 @@ export default async function AircraftPage({
               <FigureGrid figures={plates} />
             </div>
           </section>
-        ) : (
-          <section className="mx-auto max-w-[1500px] px-[5vw] pb-16">
-            <div className="grid gap-10 lg:grid-cols-[180px_minmax(0,1fr)]">
-              <h2 className="label-meta text-ember-500">04 — Drawings</h2>
-              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                <PlaceholderBlock kind="image" note={`${a.name} CAD drawings`} aspect="4 / 3" />
-                <PlaceholderBlock kind="image" note={`${a.name} in flight`} aspect="4 / 3" />
-                <PlaceholderBlock kind="image" note="Figures from the design report" aspect="4 / 3" />
-              </div>
-            </div>
-          </section>
-        )}
+        ) : null}
 
         {/* --- Other aircraft ------------------------------------------------ */}
         <section className="mx-auto max-w-[1500px] px-[5vw] pb-24">

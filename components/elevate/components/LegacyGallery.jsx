@@ -2,9 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import seasons from "../legacy-media.json";
+import archive from "../legacy-media.json";
+import selection from "../legacy-selection.json";
 import "./legacy.css";
 
+const seasons = archive.map((season) => ({
+  ...season,
+  media: season.media.filter((_, index) => selection[season.folder]?.includes(index + 1)),
+}));
 const archiveEnds = [seasons[0], seasons.find((season) => season.folder === "18-19"), seasons.at(-1)];
 
 function mediaImage(item) {

@@ -20,7 +20,7 @@ export default function AircraftIndex() {
     <>
       <Navbar />
 
-      <main id="main" className="pt-[var(--nav-h)]">
+      <main id="main" className="subpage pt-[var(--nav-h)]">
         <section className="mx-auto max-w-[1500px] px-[5vw] py-14 lg:py-20">
           <div className="flex items-center gap-3">
             <span className="h-3 w-3 bg-ember-500" />

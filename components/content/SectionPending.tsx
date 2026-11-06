@@ -13,7 +13,6 @@ export function SectionPending({
   index,
   title,
   intent,
-  needs,
 }: {
   index: string;
   title: string;
@@ -22,27 +21,25 @@ export function SectionPending({
   /** The real material required before it can be built. */
   needs: string[];
 }) {
+  const destination = title === "Media" ? { href: "/#legacy", label: "Explore the archive" }
+    : title === "Sponsors" ? { href: "/#sponsors", label: "See the fleet" }
+    : title === "SAE Aero Design" ? { href: "/#prizes", label: "See our results" }
+    : { href: "/#faq", label: "Explore Skylark" };
   return (
     <>
       <Navbar />
       <main
         id="main"
-        className="mx-auto max-w-[1100px] px-[6vw] pb-32 pt-[calc(var(--nav-h)+6rem)]"
+        className="subpage mx-auto max-w-[1100px] px-[6vw] pb-32 pt-[calc(var(--nav-h)+6rem)]"
       >
         <p className="label-meta text-ember-500">{index}</p>
         <h1 className="h-display mt-4">{title}</h1>
         <p className="prose-skylark mt-6">{intent}</p>
 
         <section className="mt-16 border-t border-white/[0.09] pt-8">
-          <h2 className="label-meta">Needed to build this page</h2>
-          <ul className="mt-5 space-y-3">
-            {needs.map((need) => (
-              <li key={need} className="flex gap-4 text-body text-ivory-200">
-                <span className="mt-2 h-px w-6 shrink-0 bg-ember-500" />
-                {need}
-              </li>
-            ))}
-          </ul>
+          <h2 className="h-heading">The story continues.</h2>
+          <p className="prose-skylark mt-4">A fuller look at this part of Skylark is on its way. In the meantime, there is more to explore from the team.</p>
+          <Link href={destination.href} className="link-action mt-7 inline-flex items-center gap-3">{destination.label} <span aria-hidden="true">↗</span></Link>
         </section>
 
         <Link

@@ -44,21 +44,20 @@ function Circled({ children }) {
 /* Plate sizes follow the viewport's shape so the painted sky is never
    stretched; widths are capped because the plates are soft by nature. */
 function useSkyPlates() {
-  const [urls, setUrls] = useState({});
+  const [urls, setUrls] = useState({ hero: "/images/intro/cloudscape-v2.webp" });
   useEffect(() => {
     let cancelled = false;
     let made = {};
     const ratio = window.innerHeight / Math.max(window.innerWidth, 1);
     const width = Math.min(1600, Math.round(window.innerWidth * Math.min(window.devicePixelRatio || 1, 1.5)));
     paintSky({
-      hero: { mode: "hero", width, height: width * ratio * 2, seed: 3 },
       strip: { mode: "strip", width: 2800, height: 380, seed: 11 },
       about: { mode: "about", width, height: width * ratio * 3, seed: 7 },
     })
       .then((out) => {
         made = out;
         if (cancelled) Object.values(out).forEach((u) => u && URL.revokeObjectURL(u));
-        else setUrls(out);
+        else setUrls((current) => ({ ...current, ...out }));
       })
       .catch(() => {
         /* no WebGL: the CSS gradients underneath still read as sky */

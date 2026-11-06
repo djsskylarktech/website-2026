@@ -1,6 +1,5 @@
 import { Navbar } from "@/components/navigation/Navbar";
-import { Placeholder } from "@/components/ui/Placeholder";
-import { alumni, departments, members, membersOf, quotes, TEAM_SIZE } from "@/data/team";
+import { alumni, departments, membersOf, quotes, TEAM_SIZE } from "@/data/team";
 
 export const metadata = {
   title: "Team",
@@ -18,13 +17,11 @@ export const metadata = {
  * role rather than given a generated face.
  */
 export default function TeamPage() {
-  const hasRoster = members.length > 0;
-
   return (
     <>
       <Navbar />
 
-      <main id="main" className="pt-[var(--nav-h)]">
+      <main id="main" className="subpage pt-[var(--nav-h)]">
         <section className="mx-auto max-w-[1500px] px-[5vw] py-14 lg:py-20">
           <div className="flex items-center gap-3">
             <span className="h-3 w-3 bg-ember-500" />
@@ -66,11 +63,7 @@ export default function TeamPage() {
                         </li>
                       ))}
                     </ul>
-                  ) : (
-                    <div className="mt-5 border-t border-white/[0.12] pt-4">
-                      <Placeholder kind="data" note={`${d.name} roster`} />
-                    </div>
-                  )}
+                  ) : null}
                 </section>
               );
             })}
@@ -78,7 +71,7 @@ export default function TeamPage() {
         </section>
 
         {/* --- Quotes -------------------------------------------------------- */}
-        <section className="mx-auto max-w-[1500px] px-[5vw] pb-16">
+        {quotes.length > 0 && <section className="mx-auto max-w-[1500px] px-[5vw] pb-16">
           <h2 className="label-meta text-ember-500">In their words</h2>
           {quotes.length > 0 ? (
             <div className="mt-6 grid gap-px sm:grid-cols-2 lg:grid-cols-3">
@@ -93,23 +86,11 @@ export default function TeamPage() {
                 </figure>
               ))}
             </div>
-          ) : (
-            <div className="mt-6 border border-dashed border-ember-500/35 p-8">
-              <p className="prose-skylark">
-                Three to five quotes from real members — what surprised them, what a test taught
-                them, what they got wrong first. Specific beats inspirational: &ldquo;what surprised
-                me was how differently it behaved once we actually flew it&rdquo; says more than any
-                sentence about growth.
-              </p>
-              <div className="mt-5">
-                <Placeholder kind="data" note="member quotes with name, role and year" />
-              </div>
-            </div>
-          )}
-        </section>
+          ) : null}
+        </section>}
 
         {/* --- Alumni -------------------------------------------------------- */}
-        <section className="mx-auto max-w-[1500px] px-[5vw] pb-24">
+        {alumni.length > 0 && <section className="mx-auto max-w-[1500px] px-[5vw] pb-24">
           <h2 className="label-meta text-ember-500">Alumni</h2>
           {alumni.length > 0 ? (
             <ul className="mt-6 border-t border-white/[0.1]">
@@ -124,14 +105,8 @@ export default function TeamPage() {
                 </li>
               ))}
             </ul>
-          ) : (
-            <div className="mt-6">
-              <Placeholder kind="data" note="alumni: name, batch, current role or university" />
-            </div>
-          )}
-        </section>
-
-        {!hasRoster ? null : <div />}
+          ) : null}
+        </section>}
       </main>
     </>
   );

@@ -1,27 +1,7 @@
 import { useEffect, useState } from "react";
 import useInView, { prefersReducedMotion } from "../hooks/useInView";
 import { cue } from "../audio/bus";
-import { paintSky } from "../intro/skyPainter";
 import Sponsors from "./Sponsors";
-
-function useHeroCloud() {
-  const [url, setUrl] = useState("");
-  useEffect(() => {
-    let cancelled = false;
-    let made = "";
-    const ratio = window.innerHeight / Math.max(window.innerWidth, 1);
-    const width = Math.min(1600, Math.round(window.innerWidth * Math.min(window.devicePixelRatio || 1, 1.5)));
-    paintSky({ hero: { mode: "hero", width, height: Math.round(width * ratio * 2), seed: 3 } })
-      .then((out) => {
-        made = out.hero || "";
-        if (cancelled) { if (made) URL.revokeObjectURL(made); }
-        else setUrl(made);
-      })
-      .catch(() => {});
-    return () => { cancelled = true; if (made) URL.revokeObjectURL(made); };
-  }, []);
-  return url;
-}
 
 const ROWS = [
   { k: "Team", v: "DJS Skylark" },
@@ -35,7 +15,7 @@ export default function BoardingPass() {
   const [ref, seen] = useInView(0.45);
   const [backRef, backSeen] = useInView(0.3);
   const [torn, setTorn] = useState(false);
-  const cloudUrl = useHeroCloud();
+  const cloudUrl = "/images/intro/cloudscape-v2.webp";
 
   useEffect(() => {
     if (!seen) {
@@ -55,7 +35,10 @@ export default function BoardingPass() {
       <div className="container bp-wrap">
         <div ref={ref} className={`bp ${seen ? "is-in" : ""} ${torn ? "is-torn" : ""}`}>
           <div className="bp__ticket">
-            <div className="bp__qr bp__qr--brand" aria-label="DJS Skylark">DJS<br />SKYLARK</div>
+            <div className="bp__qr bp__qr--brand" aria-label="DJS Skylark">
+              <span className="bp__brandMark">SKYLARK</span>
+              <span className="bp__brandNote">DJS · Aero Design<br />Mumbai, India</span>
+            </div>
             <div className="bp__perf" aria-hidden="true" />
             <div className="bp__main">
               <div className="bp__route">
