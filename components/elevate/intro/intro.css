@@ -1390,8 +1390,7 @@ html.in-jet .arriving {
 }
 
 .jx-rover-model:focus-visible {
-  outline: 2px solid #b78350;
-  outline-offset: -12px;
+  outline: none;
 }
 
 .jx-rover-model__hint {

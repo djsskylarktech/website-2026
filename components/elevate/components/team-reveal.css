@@ -1,0 +1,15 @@
+.team-reveal { background: #e8e5de; color: #262e31; padding: clamp(90px, 10vw, 160px) 0; }
+.team-reveal__inner { width: min(100% - 9vw, 1500px); margin: auto; }
+.team-reveal__eyebrow, .team-reveal__pending > span, .team-reveal__pending strong { font-family: var(--font-jet-mono, ui-monospace), monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+.team-reveal__eyebrow { color: #795d3d; }
+.team-reveal h2 { margin: 26px 0 clamp(45px, 7vw, 100px); font-size: clamp(58px, 8vw, 128px); font-weight: 500; letter-spacing: -.075em; line-height: .91; }
+.team-reveal h2 em { color: #677f81; font-family: Georgia, serif; font-weight: 400; }
+.team-reveal__pending { min-height: 260px; display: flex; flex-direction: column; justify-content: space-between; gap: 26px; border-top: 1px solid #879091; border-bottom: 1px solid #879091; padding: 24px 0; }
+.team-reveal__pending > span { color: #7f8989; }
+.team-reveal__pending p { max-width: 650px; margin: 0; font-size: clamp(22px, 3vw, 42px); letter-spacing: -.04em; line-height: 1.1; }
+.team-reveal__pending strong { color: #795d3d; font-weight: 500; }
+.team-reveal__grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+.team-reveal__grid figure { margin: 0; }
+.team-reveal__grid img { display: block; width: 100%; aspect-ratio: 4/5; object-fit: cover; }
+.team-reveal__grid figcaption { padding-top: 12px; font-size: 13px; }
+@media (max-width: 650px) { .team-reveal__inner { width: calc(100% - 32px); } .team-reveal__grid { grid-template-columns: repeat(2, minmax(0,1fr)); } }

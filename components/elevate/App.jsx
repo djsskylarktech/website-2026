@@ -5,6 +5,7 @@ import SkyBackdrop from "./components/SkyBackdrop";
 import Intro from "./intro/Intro";
 import JetSection from "./intro/JetSection";
 import LegacyGallery from "./components/LegacyGallery";
+import TeamReveal from "./components/TeamReveal";
 import BoardingPass from "./components/BoardingPass";
 import Faq from "./components/Faq";
 import Footer from "./components/Footer";
@@ -25,6 +26,7 @@ export default function SkylarkElevate() {
         <Intro />
         <JetSection />
         <LegacyGallery />
+        <TeamReveal />
         <BoardingPass />
         <Faq />
       </main>

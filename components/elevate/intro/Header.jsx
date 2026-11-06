@@ -6,6 +6,7 @@ const LINKS = [
   { href: "#brief", label: "About" },
   { href: "#legacy", label: "Legacy" },
   { href: "#prizes", label: "Aircraft" },
+  { href: "#team", label: "Team" },
 ];
 
 /* Label rolls up to a duplicate and a soft plate rises behind it on hover. */
@@ -60,6 +61,7 @@ const ALL_LINKS = [
   ...LINKS,
   { href: "#schedule", label: "Engineering" },
   { href: "#sponsors", label: "Fleet" },
+  { href: "/sponsors", label: "Sponsors" },
   { href: "#faq", label: "FAQ" },
 ];
 
@@ -113,6 +115,7 @@ export default function Header() {
         <div className="jx-header__cta jx-desktop">
           <NavItem href="#schedule">Engineering</NavItem>
           <NavItem href="#sponsors">Fleet</NavItem>
+          <NavItem href="/sponsors">Sponsors</NavItem>
           <NavItem href="#faq">FAQ</NavItem>
         </div>
       </div>
