@@ -220,7 +220,7 @@ export default function JetSection() {
                     </ul>
                     <div className="jx-u24" />
                     <p className="jx-p7 jx-gray-ink" data-jet-lines>
-                      Three worldwide SAE Aero Design podium results in 2026, built on ten years of student engineering.
+                      Three worldwide SAE Aero Design podium results in 2026, built on more than a decade of student engineering.
                     </p>
                   </div>
                 </div>

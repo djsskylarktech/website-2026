@@ -716,6 +716,34 @@ html.lenis {
   grid-column: 2;
   display: flex;
   justify-content: center;
+  position: relative;
+}
+
+.jx-logo-official {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 108px;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s ease;
+}
+.jx-logo-official img { display: block; width: 100%; height: auto; }
+.jx-logo-official__dark { display: none !important; }
+html:not(.in-intro) .jx-logo-official { opacity: 1; }
+html:not(.in-intro) .jx-header__logo .jx-logo { opacity: 0; }
+html:not(.in-intro) .jx-header__logo .jx-logo:focus-visible { opacity: 1; }
+.jx-header--ink .jx-logo-official__light,
+.jx-header--light-bg .jx-logo-official__light { display: none; }
+.jx-header--ink .jx-logo-official__dark,
+.jx-header--light-bg .jx-logo-official__dark { display: block !important; }
+@media (max-width: 991px) {
+  .jx-logo-official { width: 90px; }
+  .jx-header--ink .jx-logo-official__light,
+  .jx-header--light-bg .jx-logo-official__light { display: block; }
+  .jx-header--ink .jx-logo-official__dark,
+  .jx-header--light-bg .jx-logo-official__dark { display: none !important; }
 }
 
 .jx-logo {

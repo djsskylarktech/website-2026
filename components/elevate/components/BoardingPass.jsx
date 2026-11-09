@@ -8,7 +8,7 @@ const ROWS = [
   { k: "Home", v: "Mumbai" },
   { k: "Classes", v: "3" },
   { k: "Members", v: "47" },
-  { k: "Since", v: "2016" },
+  { k: "Since", v: "2014" },
 ];
 
 export default function BoardingPass() {
@@ -70,11 +70,11 @@ export default function BoardingPass() {
         </div>
 
         <div className="pass__countdown pass__countdown--stats">
-          <span className="pass__countLabel">Student-built since 2016</span>
+          <span className="pass__countLabel">Student-built since 2014</span>
           <div className="pass__countParts">
             <div><strong>03</strong><span>Classes</span></div>
             <div><strong>47</strong><span>Members</span></div>
-            <div><strong>10+</strong><span>Years</span></div>
+            <div><strong>12+</strong><span>Years</span></div>
           </div>
         </div>
 

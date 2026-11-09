@@ -17,7 +17,7 @@ const FAQS = [
   },
   {
     q: "Where does Skylark compete?",
-    a: `At SAE Aero Design. The team is based at ${EVENT.college}, ${EVENT.city}, and has competed since 2016.`,
+    a: `At SAE Aero Design. The team is based at ${EVENT.college}, ${EVENT.city}, and has competed since 2014.`,
   },
   {
     q: "How can I learn more or join?",

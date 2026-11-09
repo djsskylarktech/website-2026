@@ -359,7 +359,7 @@ export default function Intro() {
                 </p>
                 <div className="jx-u24" />
                 <div className="jx-l1 jx-brief__org">
-                  {EVENT.organiser} · {EVENT.partner} · Competing since 2016
+                  {EVENT.organiser} · {EVENT.partner} · {EVENT.dates}
                 </div>
               </div>
             </div>

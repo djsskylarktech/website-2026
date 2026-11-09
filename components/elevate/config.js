@@ -1,8 +1,8 @@
 // Public Skylark facts used by the Elevate-inspired landing page.
 export const EVENT = {
   name: "DJS Skylark",
-  format: "student-built aerospace team",
-  dates: "Competing since 2016",
+  format: "student-built Aero Design team",
+  dates: "Competing since 2014",
   organiser: "DJS Skylark",
   partner: "DJSCE",
   department: "Aero Design",

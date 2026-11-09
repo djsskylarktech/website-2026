@@ -111,6 +111,10 @@ export default function Header() {
           <a className="jx-logo" href="#top" data-jx-logo aria-label={`${EVENT.name} home`}>
             <BrandWordmark uppercase />
           </a>
+          <span className="jx-logo-official" aria-hidden="true">
+            <img className="jx-logo-official__light" src="/brand/djs-skylark-official-light.png" alt="" />
+            <img className="jx-logo-official__dark" src="/brand/djs-skylark-official.png" alt="" />
+          </span>
         </div>
         <div className="jx-header__cta jx-desktop">
           <NavItem href="#schedule">Engineering</NavItem>

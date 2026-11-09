@@ -43,9 +43,9 @@ export function achievementsByYear(): { year: number; results: Achievement[] }[]
 export const TEAM_FACTS = {
   college: "Dwarkadas J. Sanghvi College of Engineering",
   city: "Mumbai, India",
-  competingSince: 2016,
+  competingSince: 2014,
   /** From the proposal. */
-  experienceYears: "10+",
+  experienceYears: "12+",
   /** The three SAE Aero Design classes Skylark enters. */
   classes: ["Regular", "Micro", "Advanced"] as const,
   /** Team size as described in the 2026 technical reports. */

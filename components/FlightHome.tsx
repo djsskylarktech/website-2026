@@ -139,7 +139,7 @@ function About() {
     <FlightPanel scene="about">
       <PanelFrame index="01" label="About">
         <h2 className="h-title">
-          A student-built aerospace team from Mumbai.
+          A student-built Aero Design team from Mumbai.
         </h2>
         <p className="prose-skylark mt-5">
           DJS Skylark is the Aero Design team of {TEAM_FACTS.college}. We design, build and fly
