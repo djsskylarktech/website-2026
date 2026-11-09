@@ -719,36 +719,9 @@ html.lenis {
   position: relative;
 }
 
-.jx-logo-official {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 108px;
-  transform: translate(-50%, -50%);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .3s ease;
-}
-.jx-logo-official img { display: block; width: 100%; height: auto; }
-.jx-logo-official__dark { display: none !important; }
-html:not(.in-intro) .jx-logo-official { opacity: 1; }
-html:not(.in-intro) .jx-header__logo .jx-logo { opacity: 0; }
-html:not(.in-intro) .jx-header__logo .jx-logo:focus-visible { opacity: 1; }
-.jx-header--ink .jx-logo-official__light,
-.jx-header--light-bg .jx-logo-official__light { display: none; }
-.jx-header--ink .jx-logo-official__dark,
-.jx-header--light-bg .jx-logo-official__dark { display: block !important; }
-@media (max-width: 991px) {
-  .jx-logo-official { width: 90px; }
-  .jx-header--ink .jx-logo-official__light,
-  .jx-header--light-bg .jx-logo-official__light { display: block; }
-  .jx-header--ink .jx-logo-official__dark,
-  .jx-header--light-bg .jx-logo-official__dark { display: none !important; }
-}
-
 .jx-logo {
   display: flex;
-  width: calc(187 * var(--u));
+  width: 108px;
   align-items: center;
   justify-content: center;
   font-size: calc(22 * var(--u));
@@ -761,29 +734,18 @@ html:not(.in-intro) .jx-header__logo .jx-logo:focus-visible { opacity: 1; }
 }
 
 .brand-wordmark {
-  display: inline-flex;
-  align-items: center;
-  white-space: nowrap;
-  /* Keep the site's clean Archivo wordmark rather than a sci-fi display
-     face; the custom aircraft A supplies the aviation detail. */
-  font-family: "Archivo", "Helvetica Neue", Arial, sans-serif;
-  font-stretch: 125%;
-  font-weight: 600;
-  letter-spacing: 0.03em;
+  display: block;
+  width: 100%;
 }
-
-.brand-wordmark__a {
-  width: 0.88em;
-  height: 1em;
-  margin: 0 0.035em 0 0.005em;
-  flex: 0 0 auto;
-  transform: translateY(0.02em);
-  filter: drop-shadow(0 4px 5px rgba(0, 0, 0, 0.58)) drop-shadow(0 0 9px rgba(255, 255, 255, 0.16));
-}
-
-.brand-wordmark__version {
-  margin-left: 0.3em;
-  font-weight: 500;
+.brand-wordmark img { display: block; width: 100%; height: auto; }
+.brand-wordmark__light { display: none !important; }
+html:not(.in-intro) .jx-header:not(.jx-header--ink):not(.jx-header--light-bg) .brand-wordmark__dark { display: none; }
+html:not(.in-intro) .jx-header:not(.jx-header--ink):not(.jx-header--light-bg) .brand-wordmark__light { display: block !important; }
+@media (max-width: 991px) {
+  .jx-header .brand-wordmark__dark { display: none; }
+  .jx-header .brand-wordmark__light { display: block !important; }
+  html.in-intro .jx-header .brand-wordmark__dark { display: block; }
+  html.in-intro .jx-header .brand-wordmark__light { display: none !important; }
 }
 
 .jx-nav-item {
@@ -965,7 +927,7 @@ html.jx-menu-open {
     height: calc(40 * var(--u));
   }
   .jx-logo {
-    width: auto;
+    width: 90px;
     font-size: calc(29 * var(--u));
     line-height: 1;
   }
