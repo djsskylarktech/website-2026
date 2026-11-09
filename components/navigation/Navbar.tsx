@@ -43,7 +43,7 @@ export function Navbar({ overFlight = false }: { overFlight?: boolean }) {
         className="mx-auto flex h-full max-w-[1600px] items-center justify-between gap-6 px-[4vw]"
       >
         <Link href="/" className="flex items-baseline gap-2.5 no-underline">
-          <img src="/brand/djs-skylark-official-light.png?v=2" alt="DJS Skylark" className="h-12 w-auto" />
+          <img src="/brand/djs-skylark-official-light.png?v=3" alt="DJS Skylark" className="h-12 w-auto" />
         </Link>
 
         <div

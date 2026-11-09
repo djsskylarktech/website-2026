@@ -16,7 +16,7 @@ export default function Footer() {
             {/* drop the committee logo at public/nsdc-logo.png and it appears
                 here; until the file exists the mark is simply omitted */}
             <div className="footer__brand">
-              <img src="/brand/djs-skylark-official-light.png?v=2" alt="DJS Skylark" className="footer__official-logo" loading="lazy" decoding="async" />
+              <img src="/brand/djs-skylark-official-light.png?v=3" alt="DJS Skylark" className="footer__official-logo" loading="lazy" decoding="async" />
             </div>
           </div>
           <p className="footer__tag">{ORGANISER.blurb}</p>
