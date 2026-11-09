@@ -36,7 +36,7 @@ export default function BoardingPass() {
         <div ref={ref} className={`bp ${seen ? "is-in" : ""} ${torn ? "is-torn" : ""}`}>
           <div className="bp__ticket">
             <div className="bp__qr bp__qr--brand" aria-label="DJS Skylark">
-              <img src="/brand/djs-skylark-official.png" alt="DJS Skylark" className="bp__official-logo" loading="lazy" decoding="async" />
+              <img src="/brand/djs-skylark-official.png?v=2" alt="DJS Skylark" className="bp__official-logo" loading="lazy" decoding="async" />
               <span className="bp__brandNote">DJS · Aero Design<br />Mumbai, India</span>
             </div>
             <div className="bp__perf" aria-hidden="true" />
